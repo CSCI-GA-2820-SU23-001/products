@@ -8,6 +8,7 @@ import unittest
 from datetime import date
 from werkzeug.exceptions import NotFound
 from service.models import Product, DataValidationError, db
+from service import app
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb"
