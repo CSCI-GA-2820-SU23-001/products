@@ -76,7 +76,7 @@ class Product(db.Model):
             "desc": self.desc,
             "category": self.category,
             "stock": self.stock,
-            "create_date": self.create_date,
+            "create_date": self.create_date.isoformat(),
         }
 
     def deserialize(self, data):
@@ -89,24 +89,17 @@ class Product(db.Model):
         try:
             self.name = data["name"]
             self.price = data["price"]
-            if desc in data:
+            if "desc" in data:
                 self.desc = data["desc"]
             self.category = data["category"]
             self.stock = data["stock"]
             self.create_date = date.fromisoformat(data["create_date"])
         except AttributeError as error:
-            raise DataValidationError(
-                "Invalid Attribute: body of request contained bad or no data " + + error.args[0]
-            ) from error
+            raise DataValidationError("Invalid Attribute: " + error.args[0]) from error
         except KeyError as error:
-            raise DataValidationError(
-                "Invalid Product: missing " + error.args[0]
-            ) from error
+            raise DataValidationError("Invalid Product: missing " + error.args[0]) from error
         except TypeError as error:
-            raise DataValidationError(
-                "Invalid Product: body of request contained bad or no data - "
-                "Error message: " + error
-            ) from error
+            raise DataValidationError("Invalid Product: body of request contained bad or no data " + str(error)) from error
         return self
 
     @classmethod
@@ -120,23 +113,97 @@ class Product(db.Model):
         db.create_all()  # make our sqlalchemy tables
 
     @classmethod
-    def all(cls):
+    def all(cls) -> list:
         """ Returns all of the Products in the database """
         logger.info("Processing all Products")
         return cls.query.all()
 
     @classmethod
-    def find(cls, by_id):
+    def find(cls, product_id: int):
         """ Finds a Product by it's ID """
-        logger.info("Processing lookup for id %s ...", by_id)
-        return cls.query.get(by_id)
+        logger.info("Processing lookup for id %s ...", product_id)
+        return cls.query.get(product_id)
 
     @classmethod
-    def find_by_name(cls, name):
+    def find_or_404(cls, product_id: int):
+        """Find a Product by it's id
+
+        :param product_id: the id of the Product to find
+        :type product_id: int
+
+        :return: an instance with the product_id, or 404_NOT_FOUND if not found
+        :rtype: Product
+
+        """
+        logger.info("Processing lookup or 404 for id %s ...", product_id)
+        return cls.query.get_or_404(product_id)
+
+    @classmethod
+    def find_by_name(cls, name: str) -> list:
         """Returns all Products with the given name
 
-        Args:
-            name (string): the name of the Products you want to match
+        :param name: the name of the Products you want to match
+        :type name: str
+
+        :return: a collection of Products with that name
+        :rtype: list
+
         """
         logger.info("Processing name query for %s ...", name)
         return cls.query.filter(cls.name == name)
+
+    @classmethod
+    def find_by_category(cls, category: str) -> list:
+        """Returns all of the Products in a category
+
+        :param category: the category of the Products you want to match
+        :type category: str
+
+        :return: a collection of Products in that category
+        :rtype: list
+
+        """
+        logger.info("Processing category query for %s ...", category)
+        return cls.query.filter(cls.category == category)
+
+    @classmethod
+    def find_by_price(cls, price: float) -> list:
+        """Returns all of the Products of a given price
+
+        :param category: the price of the Products you want to match
+        :type category: float
+
+        :return: a collection of Products with that price
+        :rtype: list
+
+        """
+        logger.info("Processing price query for %s ...", price)
+        return cls.query.filter(cls.price == price)
+
+    @classmethod
+    def find_by_stock(cls, stock: int) -> list:
+        """Returns all of the Products of a given stock
+
+        :param category: the stock of the Products you want to match
+        :type category: int
+
+        :return: a collection of Products with that stock
+        :rtype: list
+
+        """
+        logger.info("Processing stock query for %s ...", stock)
+        return cls.query.filter(cls.stock == stock)
+
+    @classmethod
+    def find_by_create_date(cls, create_date: date) -> list:
+        """Returns all of the Products of a given date
+
+        :param category: the date of the Products you want to match
+        :type category: date
+
+        :return: a collection of Products with that date
+        :rtype: list
+
+        """
+        logger.info("Processing date query for %s ...", create_date)
+        return cls.query.filter(cls.create_date == create_date)
