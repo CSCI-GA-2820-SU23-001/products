@@ -45,6 +45,7 @@ def create_products():
     product.deserialize(request.get_json())
     product.create()
     message = product.serialize()
+    # TO-DO: When get_product is implemented, uncommented below
     # location_url = url_for("get_products", product_id=product.id, _external=True)
     location_url = "not implemented"
     app.logger.info("Product with ID [%s] created.", product.id)
