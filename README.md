@@ -28,7 +28,7 @@ These should be copied using a bash shell as follows:
 ```
 ## Product Service APIs
 
-## Product Operations - Usage
+### Product Operations
 
 | Endpoint        | Methods | Rule
 | --------------- | ------- | --------------------------
