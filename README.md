@@ -38,7 +38,7 @@ These should be copied using a bash shell as follows:
 
 ### List Products
 
-URL: 'http:'
+URL : `http` 
 
 Method: GET
 
@@ -46,13 +46,16 @@ List All Products
 
 Example:
 
-Success Response: 'HTTP_200_OK'
-'''
+Success Response : `HTTP_200_OK`
+
+```
 [
     {
+        "name": "Computer"
 
     }
 ]
+```
 
 
 ## Contents
