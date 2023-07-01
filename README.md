@@ -47,12 +47,14 @@ List All Products
 Example:
 
 Success Response: 'HTTP_200_OK'
-'''
+```
 [
     {
+        "name": "Computer"
 
     }
 ]
+```
 
 
 ## Contents
