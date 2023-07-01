@@ -17,9 +17,9 @@ class ProductFactory(factory.Factory):
         model = Product
 
     id = factory.Sequence(lambda n: n)
-    name = FuzzyChoice(choices=["product1", "product2", "product3, product4, product5"])
+    name = FuzzyChoice(choices=["product1", "product2", "product3", "product4", "product5"])
     price = FuzzyFloat(10, 60)
     desc = factory.Faker("text")
-    category = FuzzyChoice(choices=["category1", "category2", "category3, category4, category5"])
+    category = FuzzyChoice(choices=["category1", "category2", "category3", "category4", "category5"])
     stock = FuzzyInteger(0, 40)
     create_date = FuzzyDate(date(2008, 1, 1))
