@@ -40,6 +40,47 @@ These should be copied using a bash shell as follows:
 
 ## Product Service APIs - Usage 
 
+### Create a Product
+
+URL : `http`
+
+Method : POST
+
+Auth required : No
+
+Permissions required : No
+
+Create a product using a JSON file that includes the product's name, description, price, category, stock, and creation date.
+
+Example:
+
+Request Body (JSON)
+```
+{
+  "name": "Computer",
+  "price": 1000,
+  "desc": "This is more popular",
+  "category": "electronics",
+  "stock": 10,
+  "created_date": "2023-07-01"
+}
+
+```
+
+Success Response : `HTTP_201_CREATED`
+```
+{
+  "id": 666,
+  "name": "Computer",
+  "price": 1000,
+  "desc": "This is more popular",
+  "category": "electronics",
+  "stock": 10,
+  "created_date": "2023-07-01"
+}
+
+```
+
 ### List Products
 
 URL : `http` 
@@ -48,7 +89,7 @@ Method: GET
 
 Auth required : No
 
-Permissions required : None
+Permissions required : No
 
 List All Products
 
