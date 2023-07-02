@@ -26,6 +26,37 @@ These should be copied using a bash shell as follows:
     cp .flaskenv ../<your_repo_folder>/
     cp .gitattributes ../<your_repo_folder>/
 ```
+## Product Service APIs
+
+### Product Operations
+
+| Endpoint        | Methods | Rule
+| --------------- | ------- | --------------------------
+| list_products   | GET     | ```/products```
+
+## Product Service APIs - Usage 
+
+### List Products
+
+URL : `http` 
+
+Method: GET
+
+List All Products
+
+Example:
+
+Success Response : `HTTP_200_OK`
+
+```
+[
+    {
+        "name": "Computer"
+
+    }
+]
+```
+
 
 ## Contents
 

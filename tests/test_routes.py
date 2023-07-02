@@ -1,5 +1,5 @@
 """
-TestYourResourceModel API Service Test Suite
+TestProduct API Service Test Suite
 
 Test cases can be run with the following:
   nosetests -v --with-spec --spec-color
@@ -14,6 +14,7 @@ from service.models import db, init_db, Product
 from service.common import status  # HTTP Status Codes
 
 from tests.factories import ProductFactory
+from datetime import date
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb"
@@ -77,7 +78,7 @@ class TestProductService(TestCase):
         self.assertEqual(new_product["desc"], test_product.desc)
         self.assertEqual(new_product["category"], test_product.category)
         self.assertEqual(new_product["stock"], test_product.stock)
-        self.assertEqual(new_product["create_date"], test_product.create_date)
+        self.assertEqual(date.fromisoformat(new_product["create_date"]), test_product.create_date)
 
         # TO-DO: When get_product is implemented, uncommented below
         # Check that the location header was correct
@@ -92,4 +93,21 @@ class TestProductService(TestCase):
         # self.assertEqual(new_product["stock"], test_product.stock)
         # self.assertEqual(new_product["create_date"], test_product.create_date)
 
-        
+        ######################################################################
+    #  T E S T   S A D   P A T H S
+    ######################################################################
+
+    def test_create_product_no_data(self):
+        """It should not Create a Product with missing data"""
+        response = self.client.post(BASE_URL, json={})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_product_no_content_type(self):
+        """It should not Create a Product with no content type"""
+        response = self.client.post(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+    def test_create_product_wrong_content_type(self):
+        """It should not Create a Product with the wrong content type"""
+        response = self.client.post(BASE_URL, data="hello", content_type="text/html")
+        self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
