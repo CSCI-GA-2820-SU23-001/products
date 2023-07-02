@@ -30,9 +30,13 @@ These should be copied using a bash shell as follows:
 
 ### Product Operations
 
-| Endpoint        | Methods | Rule
-| --------------- | ------- | --------------------------
-| list_products   | GET     | ```/products```
+| Endpoint         | Methods | Rule
+| ---------------  | ------- | --------------------------
+| create_a_product | POST    | ```/products```
+| add_a_product    | PUT     | ```/products/{int:product_id}```
+| update_products  | PUT     | ```/products/{int:product_id}```
+| delete_products  | DELETE  | ```/products/{int:product_id}```
+| list_products    | GET     | ```/products```
 
 ## Product Service APIs - Usage 
 
@@ -41,6 +45,10 @@ These should be copied using a bash shell as follows:
 URL : `http` 
 
 Method: GET
+
+Auth required : No
+
+Permissions required : None
 
 List All Products
 
@@ -51,8 +59,13 @@ Success Response : `HTTP_200_OK`
 ```
 [
     {
-        "name": "Computer"
-
+        "id": 666,
+        "name": "Computer",
+        "price": 1000,
+        "desc": "This is more popular",
+        "category": "electronics",
+        "stock": 10,
+        "created_date": "2023-07-01"
     }
 ]
 ```
