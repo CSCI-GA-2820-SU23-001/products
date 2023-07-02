@@ -30,17 +30,172 @@ These should be copied using a bash shell as follows:
 
 ### Product Operations
 
-| Endpoint        | Methods | Rule
-| --------------- | ------- | --------------------------
-| list_products   | GET     | ```/products```
+| Endpoint         | Methods | Rule
+| ---------------  | ------- | --------------------------
+| create_a_product | POST    | ```/products```
+| read_a_product   | GET     | ```/products/{int:product_id}```
+| update_a_product | PUT     | ```/products/{int:product_id}```
+| delete_products  | DELETE  | ```/products/{int:product_id}```
+| list_products    | GET     | ```/products```
 
 ## Product Service APIs - Usage 
+
+### Create a Product
+
+URL : `http`
+
+Method : POST
+
+Auth required : No
+
+Permissions required : No
+
+Create a product using a JSON file that includes the product's name, description, price, category, stock, and creation date.
+
+Example:
+
+Request Body (JSON)
+```
+{
+  "name": "Computer",
+  "price": 1000,
+  "desc": "This is more popular",
+  "category": "electronics",
+  "stock": 10,
+  "created_date": "2023-07-01"
+}
+
+```
+
+Success Response : `HTTP_201_CREATED`
+```
+{
+  "id": 666,
+  "name": "Computer",
+  "price": 1000,
+  "desc": "This is more popular",
+  "category": "electronics",
+  "stock": 10,
+  "created_date": "2023-07-01"
+}
+
+```
+### Read a Product
+
+URL : `http:`
+
+Method : GET
+
+Auth required : No
+
+Permissions required : No
+
+Reads a product with id provided in the URL
+
+Example:
+
+Success Response : `HTTP_200_OK`
+```
+{
+  "id": 666,
+  "name": "Computer",
+  "price": 1000,
+  "desc": "This is more popular",
+  "category": "electronics",
+  "stock": 10,
+  "created_date": "2023-07-01"
+}
+
+```
+
+Failure Response : `HTTP_404_NOT_FOUND`
+```
+{
+  "error": "Not Found",
+  "message": "404 Not Found: Product with id '222' could not be found.",
+  "status": 404
+}
+
+```
+
+### Update a Product
+
+URL : `http`
+
+Method : PUT
+
+Auth required : No
+
+Permissions required : No
+
+Updates a product with id provided in the URL according to the updated fields provided in the body
+
+Example:
+
+Request Body (JSON)
+```
+{
+  "name": "Computer",
+  "price": 1000,
+  "desc": "This is more popular",
+  "category": "electronics",
+  "stock": 10,
+  "created_date": "2023-07-01"
+}
+
+```
+
+
+Success Response : `HTTP_200_OK`
+```
+{
+  "id": 666,
+  "name": "Computer",
+  "price": 1000,
+  "desc": "This is more popular",
+  "category": "electronics",
+  "stock": 10,
+  "created_date": "2023-07-01"
+}
+
+```
+
+Failure Response : `HTTP_404_NOT_FOUND`
+```
+{
+  "error": "Not Found",
+  "message": "404 Not Found: Product with id '222' could not be found.",
+  "status": 404
+}
+
+```
+
+### Delete a Product
+
+URL : `http`
+
+Method : DELETE
+
+Auth required : No
+
+Permissions required : No
+
+Deletes a Product with id
+
+Example:
+
+Success Response : `204 NO CONTENT`
+
 
 ### List Products
 
 URL : `http` 
 
 Method: GET
+
+Auth required : No
+
+Permissions required : No
 
 List All Products
 
@@ -51,8 +206,13 @@ Success Response : `HTTP_200_OK`
 ```
 [
     {
-        "name": "Computer"
-
+        "id": 666,
+        "name": "Computer",
+        "price": 1000,
+        "desc": "This is more popular",
+        "category": "electronics",
+        "stock": 10,
+        "created_date": "2023-07-01"
     }
 ]
 ```
