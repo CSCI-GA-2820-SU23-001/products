@@ -118,6 +118,58 @@ Failure Response : `HTTP_404_NOT_FOUND`
 
 ```
 
+### Update a Product
+
+URL : `http`
+
+Method : PUT
+
+Auth required : No
+
+Permissions required : No
+
+Updates a product with id provided in the URL according to the updated fields provided in the body
+
+Example:
+
+Request Body (JSON)
+```
+{
+  "name": "Computer",
+  "price": 1000,
+  "desc": "This is more popular",
+  "category": "electronics",
+  "stock": 10,
+  "created_date": "2023-07-01"
+}
+
+```
+
+
+Success Response : `HTTP_200_OK`
+```
+{
+  "id": 666,
+  "name": "Computer",
+  "price": 1000,
+  "desc": "This is more popular",
+  "category": "electronics",
+  "stock": 10,
+  "created_date": "2023-07-01"
+}
+
+```
+
+Failure Response : `HTTP_404_NOT_FOUND`
+```
+{
+  "error": "Not Found",
+  "message": "404 Not Found: Product with id '222' could not be found.",
+  "status": 404
+}
+
+```
+
 
 ### List Products
 
