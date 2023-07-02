@@ -170,6 +170,22 @@ Failure Response : `HTTP_404_NOT_FOUND`
 
 ```
 
+### Delete a Product
+
+URL : `http`
+
+Method : DELETE
+
+Auth required : No
+
+Permissions required : No
+
+Deletes a Product with id
+
+Example:
+
+Success Response : `204 NO CONTENT`
+
 
 ### List Products
 
