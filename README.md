@@ -33,8 +33,8 @@ These should be copied using a bash shell as follows:
 | Endpoint         | Methods | Rule
 | ---------------  | ------- | --------------------------
 | create_a_product | POST    | ```/products```
-| add_a_product    | PUT     | ```/products/{int:product_id}```
-| update_products  | PUT     | ```/products/{int:product_id}```
+| read_a_product   | GET     | ```/products/{int:product_id}```
+| update_a_product | PUT     | ```/products/{int:product_id}```
 | delete_products  | DELETE  | ```/products/{int:product_id}```
 | list_products    | GET     | ```/products```
 
@@ -80,6 +80,44 @@ Success Response : `HTTP_201_CREATED`
 }
 
 ```
+### Read a Product
+
+URL : `http:`
+
+Method : GET
+
+Auth required : No
+
+Permissions required : No
+
+Reads a product with id provided in the URL
+
+Example:
+
+Success Response : `HTTP_200_OK`
+```
+{
+  "id": 666,
+  "name": "Computer",
+  "price": 1000,
+  "desc": "This is more popular",
+  "category": "electronics",
+  "stock": 10,
+  "created_date": "2023-07-01"
+}
+
+```
+
+Failure Response : `HTTP_404_NOT_FOUND`
+```
+{
+  "error": "Not Found",
+  "message": "404 Not Found: Product with id '222' could not be found.",
+  "status": 404
+}
+
+```
+
 
 ### List Products
 
