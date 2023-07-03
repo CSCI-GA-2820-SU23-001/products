@@ -51,6 +51,31 @@ def create_products():
     app.logger.info("Product with ID [%s] created.", product.id)
     return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
 
+######################################################################
+# UPDATE A PRODUCT
+######################################################################
+@app.route("/products/<int:product_id>", methods=["PUT"])
+def update_products(product_id):
+    """
+    Update a Product
+    This endpoint will update a Product based on the content that is posted
+    """
+    app.logger.info("Request to update the product with id: %s", product_id)
+    check_content_type("application/json")
+
+    product = Product.find(product_id)
+    if not product:
+        abort(
+            status.HTTP_404_NOT_FOUND, f"Product with id '{product_id}' was not found."
+        )
+
+    product.deserialize(request.get_json())
+    product.id = product_id
+    product.update()
+    message = product.serialize()
+
+    app.logger.info("Product with id [%s] successfully updated.", product.id)
+    return jsonify(message), status.HTTP_200_OK
 
 def check_content_type(content_type):
     """Checks that the media type is correct"""
