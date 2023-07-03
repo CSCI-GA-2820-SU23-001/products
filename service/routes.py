@@ -77,6 +77,24 @@ def update_products(product_id):
     app.logger.info("Product with id [%s] successfully updated.", product.id)
     return jsonify(message), status.HTTP_200_OK
 
+######################################################################
+# DELETE A PRODUCT
+######################################################################
+@app.route("/products/<int:product_id>", methods=["DELETE"])
+def delete_products(product_id):
+    """
+    Delete an existing Product
+    This endpoint will delete a Product based on it's id
+    """
+    app.logger.info("Request to delete product with id: %s", product_id)
+    product = Product.find(product_id)
+
+    if product:
+        product.delete()
+
+    return jsonify(message="success"), status.HTTP_204_NO_CONTENT
+
+
 def check_content_type(content_type):
     """Checks that the media type is correct"""
     if "Content-Type" not in request.headers:
