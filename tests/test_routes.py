@@ -109,6 +109,14 @@ class TestProductService(TestCase):
         updated_product = response.get_json()
         self.assertEqual(updated_product["category"], "category10")
 
+    def test_list_products(self):
+        """This should list all products"""
+        products = self._create_products(5)
+        response = self.client.get(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.get_json()), len(products))
+
+        
     def test_create_product(self):
         """It should Create a new Product"""
         test_product = ProductFactory()

@@ -96,6 +96,23 @@ def update_products(product_id):
     return jsonify(message), status.HTTP_200_OK
 
 ######################################################################
+# LIST PRODUCTS
+######################################################################
+@app.route("/products", methods=["GET"])
+
+def list_products():
+        """ Returns all of the Products """
+        app.logger.info("Request to list Products...")
+        products = []
+        app.logger.info('Returning unfiltered list.')
+        products = Product.all()
+
+        # app.logger.info('[%s] Products returned', len(products))
+        results = [product.serialize() for product in products]
+        return results, status.HTTP_200_OK
+
+
+######################################################################
 # DELETE A PRODUCT
 ######################################################################
 @app.route("/products/<int:product_id>", methods=["DELETE"])
