@@ -8,13 +8,13 @@ Test cases can be run with the following:
 import os
 import logging
 from unittest import TestCase
-from unittest.mock import MagicMock, patch
+from datetime import date
+# from unittest.mock import MagicMock, patch
 from service import app
 from service.models import db, init_db, Product
 from service.common import status  # HTTP Status Codes
 
 from tests.factories import ProductFactory
-from datetime import date
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb"
@@ -24,6 +24,8 @@ BASE_URL = "/products"
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
+
+
 class TestProductService(TestCase):
     """Product Server Tests"""
 
@@ -50,7 +52,7 @@ class TestProductService(TestCase):
 
     def tearDown(self):
         db.session.remove()
-    
+
     def _create_products(self, count):
         """Factory method to create products in bulk"""
         products = []
@@ -116,7 +118,6 @@ class TestProductService(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.get_json()), len(products))
 
-        
     def test_create_product(self):
         """It should Create a new Product"""
         test_product = ProductFactory()
@@ -156,7 +157,7 @@ class TestProductService(TestCase):
         response = self.client.delete(f"{BASE_URL}/{test_product.id}")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(len(response.data), 0)
-        
+
         # TO-DO: make sure they are deleted
         # After get_product is completed, uncomment the following codes
 
@@ -181,4 +182,3 @@ class TestProductService(TestCase):
         """It should not Create a Product with the wrong content type"""
         response = self.client.post(BASE_URL, data="hello", content_type="text/html")
         self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-

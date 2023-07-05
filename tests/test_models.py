@@ -18,6 +18,8 @@ DATABASE_URI = os.getenv(
 ######################################################################
 #  Product   M O D E L   T E S T   C A S E S
 ######################################################################
+
+
 class TestProduct(unittest.TestCase):
     """ Test Cases for Product Model """
 
@@ -59,7 +61,9 @@ class TestProduct(unittest.TestCase):
         self.assertEqual(product.category, "category1")
         self.assertEqual(product.stock, 10)
         self.assertEqual(product.create_date, date.today())
-        product = Product(name="product1", desc="description of product1", price=20, category="category1", stock=20, create_date=date.today())
+        product = Product(
+            name="product1", desc="description of product1", price=20,
+            category="category1", stock=20, create_date=date.today())
         self.assertEqual(product.price, 20)
         self.assertEqual(product.desc, "description of product1")
         self.assertEqual(product.stock, 20)
@@ -237,7 +241,6 @@ class TestProduct(unittest.TestCase):
         products = ProductFactory.create_batch(3)
         for product in products:
             product.create()
-        
         product = Product.find_or_404(products[1].id)
         self.assertIsNot(product, None)
         self.assertEqual(product.id, products[1].id)
@@ -247,7 +250,7 @@ class TestProduct(unittest.TestCase):
         self.assertEqual(product.category, products[1].category)
         self.assertEqual(product.stock, products[1].stock)
         self.assertEqual(product.create_date, products[1].create_date)
-    
+
     def test_find_or_404_not_found(self):
         """It should Find or return 404 not found"""
         self.assertRaises(NotFound, Product.find_or_404, 0)
