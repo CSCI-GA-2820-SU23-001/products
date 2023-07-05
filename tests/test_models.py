@@ -20,6 +20,7 @@ DATABASE_URI = os.getenv(
 ######################################################################
 
 
+# pylint: disable=too-many-public-methods
 class TestProduct(unittest.TestCase):
     """ Test Cases for Product Model """
 

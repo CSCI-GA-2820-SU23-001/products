@@ -19,7 +19,10 @@ from . import app
 def index():
     """ Root URL response """
     return (
-        "Reminder: return some useful information in json format about the service here",
+        jsonify(
+            name="REST APIs for the Products service",
+            paths=url_for("create_products", _external=True),
+        ),
         status.HTTP_200_OK,
     )
 
