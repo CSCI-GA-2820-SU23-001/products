@@ -42,7 +42,7 @@ These should be copied using a bash shell as follows:
 
 ### Create a Product
 
-URL : `http`
+URL : `http://127.0.0.1:8000/products`
 
 Method : POST
 
@@ -82,7 +82,7 @@ Success Response : `HTTP_201_CREATED`
 ```
 ### Read a Product
 
-URL : `http:`
+URL : `http://127.0.0.1:8000/products/{int:product_id}`
 
 Method : GET
 
@@ -120,7 +120,7 @@ Failure Response : `HTTP_404_NOT_FOUND`
 
 ### Update a Product
 
-URL : `http`
+URL : `http://127.0.0.1:8000/products/{int:product_id}`
 
 Method : PUT
 
@@ -172,7 +172,7 @@ Failure Response : `HTTP_404_NOT_FOUND`
 
 ### Delete a Product
 
-URL : `http`
+URL : `http://127.0.0.1:8000/products/{int:product_id}`
 
 Method : DELETE
 
@@ -189,7 +189,7 @@ Success Response : `204 NO CONTENT`
 
 ### List Products
 
-URL : `http` 
+URL : `http://127.0.0.1:8000/products` 
 
 Method: GET
 
