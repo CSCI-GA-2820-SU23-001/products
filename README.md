@@ -57,27 +57,30 @@ Example:
 Request Body (JSON)
 ```
 {
-  "name": "Computer",
-  "price": 1000,
-  "desc": "This is more popular",
-  "category": "electronics",
-  "stock": 10,
-  "created_date": "2023-07-01"
+  "name": "product1",
+  "price": 44.5314466590949,
+  "desc": "Tv you visit among.\nAway human white much near point market. Movie certainly career sport all model us show. Light assume under bill your.",
+  "category": "category10",
+  "stock": 31,
+  "created_date": "2008-12-03"
 }
+
 
 ```
 
 Success Response : `HTTP_201_CREATED`
 ```
-{
-  "id": 666,
-  "name": "Computer",
-  "price": 1000,
-  "desc": "This is more popular",
-  "category": "electronics",
-  "stock": 10,
-  "created_date": "2023-07-01"
-}
+[
+  {
+    "category": "category10",
+    "create_date": "2008-12-03",
+    "desc": "Tv you visit among.\nAway human white much near point market. Movie certainly career sport all model us show. Light assume under bill your.",
+    "id": 76,
+    "name": "product1",
+    "price": 44.5314466590949,
+    "stock": 31
+  }
+]
 
 ```
 ### Read a Product
@@ -96,15 +99,17 @@ Example:
 
 Success Response : `HTTP_200_OK`
 ```
-{
-  "id": 666,
-  "name": "Computer",
-  "price": 1000,
-  "desc": "This is more popular",
-  "category": "electronics",
-  "stock": 10,
-  "created_date": "2023-07-01"
-}
+[
+  {
+    "category": "category10",
+    "create_date": "2008-12-03",
+    "desc": "Tv you visit among.\nAway human white much near point market. Movie certainly career sport all model us show. Light assume under bill your.",
+    "id": 76,
+    "name": "product1",
+    "price": 44.5314466590949,
+    "stock": 31
+  }
+]
 
 ```
 
@@ -112,7 +117,7 @@ Failure Response : `HTTP_404_NOT_FOUND`
 ```
 {
   "error": "Not Found",
-  "message": "404 Not Found: Product with id '222' could not be found.",
+  "message": "404 Not Found: Product with id '1' was not found.",
   "status": 404
 }
 
@@ -135,12 +140,12 @@ Example:
 Request Body (JSON)
 ```
 {
-  "name": "Computer",
-  "price": 1000,
-  "desc": "This is more popular",
-  "category": "electronics",
-  "stock": 10,
-  "created_date": "2023-07-01"
+  "name": "product1",
+  "price": 44.5314466590949,
+  "desc": "Tv you visit among.\nAway human white much near point market. Movie certainly career sport all model us show. Light assume under bill your.",
+  "category": "category10",
+  "stock": 31,
+  "created_date": "2008-12-03"
 }
 
 ```
@@ -148,15 +153,17 @@ Request Body (JSON)
 
 Success Response : `HTTP_200_OK`
 ```
-{
-  "id": 666,
-  "name": "Computer",
-  "price": 1000,
-  "desc": "This is more popular",
-  "category": "electronics",
-  "stock": 10,
-  "created_date": "2023-07-01"
-}
+[
+  {
+    "category": "category10",
+    "create_date": "2008-12-03",
+    "desc": "Tv you visit among.\nAway human white much near point market. Movie certainly career sport all model us show. Light assume under bill your.",
+    "id": 76,
+    "name": "product1",
+    "price": 44.5314466590949,
+    "stock": 31
+  }
+]
 
 ```
 
@@ -164,7 +171,7 @@ Failure Response : `HTTP_404_NOT_FOUND`
 ```
 {
   "error": "Not Found",
-  "message": "404 Not Found: Product with id '222' could not be found.",
+  "message": "404 Not Found: Product with id '1' was not found.",
   "status": 404
 }
 
@@ -205,15 +212,15 @@ Success Response : `HTTP_200_OK`
 
 ```
 [
-    {
-        "id": 666,
-        "name": "Computer",
-        "price": 1000,
-        "desc": "This is more popular",
-        "category": "electronics",
-        "stock": 10,
-        "created_date": "2023-07-01"
-    }
+  {
+    "category": "category10",
+    "create_date": "2008-12-03",
+    "desc": "Tv you visit among.\nAway human white much near point market. Movie certainly career sport all model us show. Light assume under bill your.",
+    "id": 76,
+    "name": "product1",
+    "price": 44.5314466590949,
+    "stock": 31
+  }
 ]
 ```
 
