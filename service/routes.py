@@ -4,7 +4,7 @@ My Service
 Describe what your service does here
 """
 
-from flask import Flask, jsonify, request, url_for, make_response, abort
+from flask import jsonify, request, url_for, abort
 from service.common import status  # HTTP Status Codes
 from service.models import Product
 
@@ -45,7 +45,6 @@ def create_products():
     product.deserialize(request.get_json())
     product.create()
     message = product.serialize()
-    
     location_url = url_for("get_products", product_id=product.id, _external=True)
     app.logger.info("Product with ID [%s] created.", product.id)
     return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
@@ -53,6 +52,8 @@ def create_products():
 ######################################################################
 # READ A PRODUCT
 ######################################################################
+
+
 @app.route("/products/<int:product_id>", methods=["GET"])
 def get_products(product_id):
     """
@@ -71,6 +72,8 @@ def get_products(product_id):
 ######################################################################
 # UPDATE A PRODUCT
 ######################################################################
+
+
 @app.route("/products/<int:product_id>", methods=["PUT"])
 def update_products(product_id):
     """
@@ -97,18 +100,19 @@ def update_products(product_id):
 ######################################################################
 # LIST PRODUCTS
 ######################################################################
+
+
 @app.route("/products", methods=["GET"])
-
 def list_products():
-        """ Returns all of the Products """
-        app.logger.info("Request to list Products...")
-        products = []
-        app.logger.info('Returning unfiltered list.')
-        products = Product.all()
+    """ Returns all of the Products """
+    app.logger.info("Request to list Products...")
+    products = []
+    app.logger.info('Returning unfiltered list.')
+    products = Product.all()
 
-        # app.logger.info('[%s] Products returned', len(products))
-        results = [product.serialize() for product in products]
-        return results, status.HTTP_200_OK
+    # app.logger.info('[%s] Products returned', len(products))
+    results = [product.serialize() for product in products]
+    return results, status.HTTP_200_OK
 
 
 ######################################################################
