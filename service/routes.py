@@ -11,6 +11,16 @@ from service.models import Product
 # Import Flask application
 from . import app
 
+######################################################################
+# GET HEALTH CHECK
+######################################################################
+
+
+@app.route("/healthcheck")
+def healthcheck():
+    """Let them know our heart is still beating"""
+    return jsonify(status=200, message="Healthy"), status.HTTP_200_OK
+
 
 ######################################################################
 # GET INDEX
@@ -153,3 +163,31 @@ def check_content_type(content_type):
         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
         f"Content-Type must be {content_type}",
     )
+
+######################################################################
+# LIKE A PRODUCT
+######################################################################
+
+
+@app.route("/products/<int:product_id>/like", methods=["PUT"])
+def like_products(product_id):
+    """
+    Like a Product
+    This endpoint will like a Product based on it's id
+    """
+    app.logger.info("Request to like the product with id: %s", product_id)
+    check_content_type("application/json")
+
+    product = Product.find(product_id)
+    if not product:
+        abort(
+            status.HTTP_404_NOT_FOUND, f"Product with id '{product_id}' was not found."
+        )
+
+    product.likes += 1
+    product.id = product_id
+    product.update()
+    message = product.serialize()
+
+    app.logger.info("Product with id [%s] successfully liked.", product.id)
+    return jsonify(message), status.HTTP_200_OK

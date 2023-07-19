@@ -23,6 +23,8 @@ def init_db(app):
 class DataValidationError(Exception):
     """ Used for an data validation errors when deserializing """
 
+# pylint: disable=too-many-instance-attributes
+
 
 class Product(db.Model):
     """
@@ -39,6 +41,8 @@ class Product(db.Model):
     category = db.Column(db.String(63), nullable=False)
     stock = db.Column(db.Integer(), nullable=False)
     create_date = db.Column(db.Date(), nullable=False, default=date.today())
+    available = db.Column(db.Boolean(), nullable=False, default=True)
+    likes = db.Column(db.Integer(), nullable=False, default=0)
 
     def __repr__(self):
         return f"<Product {self.name} id=[{self.id}]>"
@@ -77,6 +81,8 @@ class Product(db.Model):
             "category": self.category,
             "stock": self.stock,
             "create_date": self.create_date.isoformat(),
+            "available": self.available,
+            "likes": self.likes
         }
 
     def deserialize(self, data):
@@ -94,8 +100,12 @@ class Product(db.Model):
             self.category = data["category"]
             self.stock = data["stock"]
             self.create_date = date.fromisoformat(data["create_date"])
-        except AttributeError as error:
-            raise DataValidationError("Invalid Attribute: " + error.args[0]) from error
+            if isinstance(data["available"], bool):
+                self.available = data["available"]
+            else:
+                raise DataValidationError("Invalid Attribute: available must be a boolean: "
+                                          + str(type(data["available"])))
+            self.likes = data["likes"]
         except KeyError as error:
             raise DataValidationError("Invalid Product: missing " + error.args[0]) from error
         except TypeError as error:
@@ -207,3 +217,17 @@ class Product(db.Model):
         """
         logger.info("Processing date query for %s ...", create_date)
         return cls.query.filter(cls.create_date == create_date)
+
+    @classmethod
+    def find_by_available(cls, available: bool = True) -> list:
+        """Returns all of the Products that are available
+
+        :param available: the availability of the Products you want to match
+        :type available: bool
+
+        :return: a collection of Products with that availability
+        :rtype: list
+
+        """
+        logger.info("Processing availability query for %s ...", available)
+        return cls.query.filter(cls.available == available)

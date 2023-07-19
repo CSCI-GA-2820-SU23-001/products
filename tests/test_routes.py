@@ -78,6 +78,14 @@ class TestProductService(TestCase):
         resp = self.client.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
+    def test_health(self):
+        """It should be healthy"""
+        response = self.client.get("/healthcheck")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(data["status"], 200)
+        self.assertEqual(data["message"], "Healthy")
+
     def test_get_product(self):
         """It should Get a single Product"""
         # get the id of a product
@@ -137,6 +145,8 @@ class TestProductService(TestCase):
         self.assertEqual(new_product["category"], test_product.category)
         self.assertEqual(new_product["stock"], test_product.stock)
         self.assertEqual(date.fromisoformat(new_product["create_date"]), test_product.create_date)
+        self.assertEqual(new_product["available"], test_product.available)
+        self.assertEqual(new_product["likes"], test_product.likes)
 
         # TO-DO: When get_product is implemented, uncommented below
         # Check that the location header was correct
@@ -164,7 +174,20 @@ class TestProductService(TestCase):
         # response = self.client.get(f"{BASE_URL}/{test_product.id}")
         # self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-        ######################################################################
+    def test_like_product(self):
+        """It should Like an existing Product"""
+        test_product = ProductFactory()
+        response = self.client.post(BASE_URL, json=test_product.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        new_product = response.get_json()
+        logging.debug(new_product)
+        old_like = new_product["likes"]
+        response = self.client.put(f"{BASE_URL}/{new_product['id']}/like", json=new_product)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        updated_product = response.get_json()
+        self.assertEqual(updated_product["likes"], old_like + 1)
+
+    ######################################################################
     #  T E S T   S A D   P A T H S
     ######################################################################
 
@@ -182,3 +205,24 @@ class TestProductService(TestCase):
         """It should not Create a Product with the wrong content type"""
         response = self.client.post(BASE_URL, data="hello", content_type="text/html")
         self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+    def test_method_not_supported(self):
+        """It should respond with a method not allowed"""
+        response = self.client.put(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_update_product_not_found(self):
+        """It should not Update a product that is not found"""
+        test_product = ProductFactory()
+        response = self.client.put(
+            f"{BASE_URL}/{test_product.id}", json=test_product.serialize()
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_like_product_not_found(self):
+        """It should not Like a product that is not found"""
+        test_product = ProductFactory()
+        response = self.client.put(
+            f"{BASE_URL}/{test_product.id}/like", json=test_product.serialize()
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

@@ -53,7 +53,8 @@ class TestProduct(unittest.TestCase):
 
     def test_create_a_product(self):
         """It should Create a product and assert that it exists"""
-        product = Product(name="product1", price=10, category="category1", stock=10, create_date=date.today())
+        product = Product(name="product1", price=10, category="category1", stock=10, create_date=date.today(),
+                          available=True, likes=0)
         self.assertEqual(str(product), "<Product product1 id=[None]>")
         self.assertTrue(product is not None)
         self.assertEqual(product.id, None)
@@ -64,16 +65,20 @@ class TestProduct(unittest.TestCase):
         self.assertEqual(product.create_date, date.today())
         product = Product(
             name="product1", desc="description of product1", price=20,
-            category="category1", stock=20, create_date=date.today())
+            category="category1", stock=20, create_date=date.today(),
+            available=True, likes=0)
         self.assertEqual(product.price, 20)
         self.assertEqual(product.desc, "description of product1")
         self.assertEqual(product.stock, 20)
+        self.assertEqual(product.available, True)
+        self.assertEqual(product.likes, 0)
 
     def test_add_a_product(self):
         """It should Create a product and add it to the database"""
         products = Product.all()
         self.assertEqual(products, [])
-        product = Product(name="product1", price=10, category="category1", stock=10, create_date=date.today())
+        product = Product(name="product1", price=10, category="category1", stock=10, create_date=date.today(),
+                          available=True, likes=0)
         self.assertTrue(product is not None)
         self.assertEqual(product.id, None)
         product.create()
@@ -98,6 +103,8 @@ class TestProduct(unittest.TestCase):
         self.assertEqual(found_product.category, product.category)
         self.assertEqual(found_product.stock, product.stock)
         self.assertEqual(found_product.create_date, product.create_date)
+        self.assertEqual(found_product.available, product.available)
+        self.assertEqual(found_product.likes, product.likes)
 
     def test_update_a_product(self):
         """It should Update a Product"""
@@ -167,6 +174,10 @@ class TestProduct(unittest.TestCase):
         self.assertEqual(data["stock"], product.stock)
         self.assertIn("create_date", data)
         self.assertEqual(date.fromisoformat(data["create_date"]), product.create_date)
+        self.assertIn("available", data)
+        self.assertEqual(data["available"], product.available)
+        self.assertIn("likes", data)
+        self.assertEqual(data["likes"], product.likes)
 
     def test_deserialize_a_product(self):
         """It should de-serialize a Product"""
@@ -181,6 +192,8 @@ class TestProduct(unittest.TestCase):
         self.assertEqual(product.category, data["category"])
         self.assertEqual(product.stock, data["stock"])
         self.assertEqual(product.create_date, date.fromisoformat(data["create_date"]))
+        self.assertEqual(product.available, data["available"])
+        self.assertEqual(product.likes, data["likes"])
 
     def test_deserialize_missing_data(self):
         """It should not deserialize a Product with missing data"""
@@ -191,6 +204,13 @@ class TestProduct(unittest.TestCase):
     def test_deserialize_bad_data(self):
         """It should not deserialize bad data"""
         data = "this is not a dictionary"
+        product = Product()
+        self.assertRaises(DataValidationError, product.deserialize, data)
+
+    def test_deserialize_bad_available(self):
+        """It should not deserialize bad available"""
+        data = ProductFactory().serialize()
+        data["available"] = "not a boolean"
         product = Product()
         self.assertRaises(DataValidationError, product.deserialize, data)
 
@@ -212,6 +232,8 @@ class TestProduct(unittest.TestCase):
         self.assertEqual(product.category, products[1].category)
         self.assertEqual(product.stock, products[1].stock)
         self.assertEqual(product.create_date, products[1].create_date)
+        self.assertEqual(product.available, products[1].available)
+        self.assertEqual(product.likes, products[1].likes)
 
     def test_find_by_category(self):
         """It should Find Products by Category"""
@@ -251,6 +273,8 @@ class TestProduct(unittest.TestCase):
         self.assertEqual(product.category, products[1].category)
         self.assertEqual(product.stock, products[1].stock)
         self.assertEqual(product.create_date, products[1].create_date)
+        self.assertEqual(product.available, products[1].available)
+        self.assertEqual(product.likes, products[1].likes)
 
     def test_find_or_404_not_found(self):
         """It should Find or return 404 not found"""
@@ -291,3 +315,21 @@ class TestProduct(unittest.TestCase):
         self.assertEqual(found.count(), count)
         for product in found:
             self.assertEqual(product.create_date, create_date)
+
+    def test_find_by_available(self):
+        """It should Find Products by Availability"""
+        products = ProductFactory.create_batch(10)
+        for product in products:
+            product.create()
+        available = products[0].available
+        count = len([product for product in products if product.available == available])
+        found = Product.find_by_available(available)
+        self.assertEqual(found.count(), count)
+        for product in found:
+            self.assertEqual(product.available, available)
+
+    def test_deserialize_invalid_attribute(self):
+        """It should not deserialize a Product with an invalid attribute"""
+        data = {"id": 1, "name": "product1", "likes": "zero"}
+        product = Product()
+        self.assertRaises(DataValidationError, product.deserialize, data)
