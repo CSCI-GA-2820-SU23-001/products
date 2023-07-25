@@ -196,6 +196,7 @@ def like_products(product_id):
 # PURCHASE A PRODUCT
 ######################################################################
 
+
 @app.route("/products/<int:product_id>/purchase", methods=["POST"])
 def purchase_product(product_id):
     """
@@ -213,5 +214,4 @@ def purchase_product(product_id):
 
     if product.purchase():
         return jsonify(product.serialize()), status.HTTP_200_OK
-    else:
-        return jsonify({"error": "Product out of stock"}), status.HTTP_409_CONFLICT
+    return jsonify({"error": "Product out of stock"}), status.HTTP_409_CONFLICT  # Removed the else statement

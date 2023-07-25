@@ -236,12 +236,8 @@ class Product(db.Model):
         """Purchases the product and updates the stock and availability"""
         if self.stock > 0:
             self.stock -= 1
-
             if self.stock == 0:
                 self.available = False
-
             db.session.commit()
-
             return True
-        else:
-            return False
+        return False  # Removed the else statement
