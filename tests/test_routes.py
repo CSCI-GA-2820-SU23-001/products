@@ -187,6 +187,64 @@ class TestProductService(TestCase):
         updated_product = response.get_json()
         self.assertEqual(updated_product["likes"], old_like + 1)
 
+    def test_purchase_product(self):
+        """It should Purchase a Product"""
+        test_product = ProductFactory()
+        test_product.available = True
+        test_product.stock = 5
+        response = self.client.post(BASE_URL, json=test_product.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        new_product = response.get_json()
+        logging.debug(new_product)
+        old_stock = new_product["stock"]
+        response = self.client.post(f"{BASE_URL}/{new_product['id']}/purchase", json=new_product)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        updated_product = response.get_json()
+        self.assertEqual(updated_product["stock"], old_stock - 1)
+
+    def test_purchase_product_out_of_stock(self):
+        """It should not Purchase a Product that is out of stock"""
+        test_product = ProductFactory()
+        test_product.available = False
+        test_product.stock = 0
+        response = self.client.post(BASE_URL, json=test_product.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        new_product = response.get_json()
+        logging.debug(new_product)
+        response = self.client.post(f"{BASE_URL}/{new_product['id']}/purchase")
+        self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
+        data = response.get_json()
+        self.assertEqual(data["error"], "Product out of stock")
+
+    def test_purchase_product_not_found(self):
+        """It should not Purchase a Product that is not found"""
+        response = self.client.post(f"{BASE_URL}/0/purchase")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        data = response.get_json()
+        self.assertIn("was not found", data["message"])
+
+    def test_purchase_product_stock_zero(self):
+        """It should Purchase a Product and update stock and availability"""
+        test_product = ProductFactory()
+        test_product.available = True
+        test_product.stock = 1  # Set stock to 1 for this test case
+        response = self.client.post(BASE_URL, json=test_product.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        new_product = response.get_json()
+        logging.debug(new_product)
+        response = self.client.post(f"{BASE_URL}/{new_product['id']}/purchase")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Check if the stock is updated to 0 and availability is set to False
+        response = self.client.get(f"{BASE_URL}/{new_product['id']}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        updated_product = response.get_json()
+        self.assertEqual(updated_product["stock"], 0)
+        self.assertEqual(updated_product["available"], False)
+
     ######################################################################
     #  T E S T   S A D   P A T H S
     ######################################################################

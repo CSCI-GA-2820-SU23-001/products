@@ -4,6 +4,7 @@ Test Factory to make fake objects for testing
 from datetime import date
 
 import factory
+from factory import LazyAttribute
 from factory.fuzzy import FuzzyChoice, FuzzyDate, FuzzyFloat, FuzzyInteger
 from service.models import Product
 
@@ -23,5 +24,5 @@ class ProductFactory(factory.Factory):
     category = FuzzyChoice(choices=["category1", "category2", "category3", "category4", "category5"])
     stock = FuzzyInteger(0, 40)
     create_date = FuzzyDate(date(2008, 1, 1))
-    available = FuzzyChoice(choices=[True, False])
+    available = LazyAttribute(lambda obj: obj.stock > 0)
     likes = factory.Sequence(lambda n: n)

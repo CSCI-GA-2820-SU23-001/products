@@ -191,3 +191,27 @@ def like_products(product_id):
 
     app.logger.info("Product with id [%s] successfully liked.", product.id)
     return jsonify(message), status.HTTP_200_OK
+
+######################################################################
+# PURCHASE A PRODUCT
+######################################################################
+
+@app.route("/products/<int:product_id>/purchase", methods=["POST"])
+def purchase_product(product_id):
+    """
+    Purchases a Product
+
+    This endpoint will handle the purchase of a product based on its id
+    """
+    app.logger.info("Request to purchase product with id: %s", product_id)
+
+    # Find the product with the given product_id
+    product = Product.find(product_id)
+
+    if not product:
+        abort(status.HTTP_404_NOT_FOUND, f"Product with id '{product_id}' was not found.")
+
+    if product.purchase():
+        return jsonify(product.serialize()), status.HTTP_200_OK
+    else:
+        return jsonify({"error": "Product out of stock"}), status.HTTP_409_CONFLICT
