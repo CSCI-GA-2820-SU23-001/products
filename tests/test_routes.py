@@ -26,6 +26,7 @@ BASE_URL = "/products"
 ######################################################################
 
 
+# pylint: disable=too-many-public-methods
 class TestProductService(TestCase):
     """Product Server Tests"""
 
@@ -95,7 +96,8 @@ class TestProductService(TestCase):
         data = response.get_json()
         self.assertEqual(data["name"], test_product.name)
 
-        # it should not Get a Product thats not found
+    def test_get_product_not_found(self):
+        """It should not Get a Product thats not found"""
         response = self.client.get(f"{BASE_URL}/0")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         data = response.get_json()
@@ -202,7 +204,8 @@ class TestProductService(TestCase):
         updated_product = response.get_json()
         self.assertEqual(updated_product["stock"], old_stock - 1)
 
-        # It should not Purchase a Product that is out of stock
+    def test_purchase_product_out_of_stock(self):
+        """It should not Purchase a Product that is out of stock"""
         test_product = ProductFactory()
         test_product.available = False
         test_product.stock = 0
@@ -216,13 +219,15 @@ class TestProductService(TestCase):
         data = response.get_json()
         self.assertEqual(data["error"], "Product out of stock")
 
-        # It should not Purchase a Product that is not found
+    def test_purchase_product_not_found(self):
+        """It should not Purchase a Product that is not found"""
         response = self.client.post(f"{BASE_URL}/0/purchase")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         data = response.get_json()
         self.assertIn("was not found", data["message"])
 
-        # It should Purchase a Product and update stock and availability"""
+    def test_purchase_product_update_status(self):
+        """It should Purchase a Product and update stock and availability"""
         test_product = ProductFactory()
         test_product.available = True
         test_product.stock = 1  # Set stock to 1 for this test case
