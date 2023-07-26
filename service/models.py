@@ -231,3 +231,13 @@ class Product(db.Model):
         """
         logger.info("Processing availability query for %s ...", available)
         return cls.query.filter(cls.available == available)
+
+    def purchase(self):
+        """Purchases the product and updates the stock and availability"""
+        if self.stock > 0:
+            self.stock -= 1
+            if self.stock == 0:
+                self.available = False
+            db.session.commit()
+            return True
+        return False  # Removed the else statement
