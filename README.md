@@ -39,6 +39,8 @@ These should be copied using a bash shell as follows:
 | update_a_product | PUT     | ```/products/{int:product_id}```
 | delete_products  | DELETE  | ```/products/{int:product_id}```
 | list_products    | GET     | ```/products```
+| like_products    | PUT     | ```/products/{int:product_id}/like```
+| purchase_product | POST    | ```/products/{int:product_id}/purchase```
 
 ## Product Service APIs - Usage 
 
@@ -242,17 +244,24 @@ config.py           - configuration parameters
 
 service/                   - service python package
 ├── __init__.py            - package initializer
+├── config.py              - global configuration for application
 ├── models.py              - module with business models
 ├── routes.py              - module with service routes
 └── common                 - common code package
     ├── error_handlers.py  - HTTP error handling code
     ├── log_handlers.py    - logging setup code
-    └── status.py          - HTTP status constants
+    ├── status.py          - HTTP status constants
+    ├── cli_commands.py    - Flask CLI Command Extensions
+    └── utils.py           - utils functions
 
-tests/              - test cases package
-├── __init__.py     - package initializer
-├── test_models.py  - test suite for business models
-└── test_routes.py  - test suite for service routes
+
+tests/                    - test cases package
+├── __init__.py           - package initializer
+├── factories.py          - test Factory to make fake objects for testing
+├── test_cli_commands.py  - CLI Command Extensions for Flask
+├── test_models.py        - test suite for business models
+└── test_routes.py        - test suite for service routes
+
 ```
 
 ## License
