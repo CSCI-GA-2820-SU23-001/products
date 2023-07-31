@@ -121,11 +121,133 @@ class TestProductService(TestCase):
         self.assertEqual(updated_product["category"], "category10")
 
     def test_list_products(self):
-        """This should list all products"""
-        products = self._create_products(5)
+        """Test listing products without filters"""
+        # Create test products
+        product1 = ProductFactory(name="Product 1", category="Category A", price=10.0)
+        response = self.client.post(BASE_URL, json=product1.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        product2 = ProductFactory(name="Product 2", category="Category B", price=15.0)
+        response = self.client.post(BASE_URL, json=product2.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        product3 = ProductFactory(name="Product 3", category="Category A", price=20.0)
+        response = self.client.post(BASE_URL, json=product3.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Send GET request without filters
         response = self.client.get(BASE_URL)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.get_json()), len(products))
+        products = response.get_json()
+        self.assertEqual(len(products), 3)  # Should return all products
+
+    def test_list_products_with_category(self):
+        """Test listing products with category filter"""
+        # Create test products
+        product1 = ProductFactory(name="Product 1", category="Category A", price=10.0)
+        response = self.client.post(BASE_URL, json=product1.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        product2 = ProductFactory(name="Product 2", category="Category B", price=15.0)
+        response = self.client.post(BASE_URL, json=product2.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        product3 = ProductFactory(name="Product 3", category="Category A", price=20.0)
+        response = self.client.post(BASE_URL, json=product3.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Send GET request with category filter
+        response = self.client.get(BASE_URL + "?category=Category%20A")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        filtered_products = response.get_json()
+        self.assertEqual(len(filtered_products), 2)  # Should return products with Category A
+
+    def test_list_products_with_price(self):
+        """Test listing products with price filter"""
+        # Create test products
+        product1 = ProductFactory(name="Product 1", category="Category A", price=10.0)
+        response = self.client.post(BASE_URL, json=product1.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        product2 = ProductFactory(name="Product 2", category="Category B", price=15.0)
+        response = self.client.post(BASE_URL, json=product2.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        product3 = ProductFactory(name="Product 3", category="Category A", price=20.0)
+        response = self.client.post(BASE_URL, json=product3.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Send GET request with price filter
+        response = self.client.get(BASE_URL + "?price=15.0")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        filtered_products = response.get_json()
+        self.assertEqual(len(filtered_products), 1)  # Should return Product 2
+
+    def test_list_products_with_stock(self):
+        """Test listing products with stock filter"""
+        # Create test products
+        product1 = ProductFactory(name="Product 1", category="Category A", price=10.0)
+        response = self.client.post(BASE_URL, json=product1.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        product2 = ProductFactory(name="Product 2", category="Category B", price=15.0)
+        response = self.client.post(BASE_URL, json=product2.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        product3 = ProductFactory(name="Product 3", category="Category A", price=20.0)
+        response = self.client.post(BASE_URL, json=product3.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Send GET request with both category and price filter
+        response = self.client.get(BASE_URL + "?category=Category%20A&price=20.0")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        filtered_products = response.get_json()
+        self.assertEqual(len(filtered_products), 1)  # Should return Product 3
+        self.assertEqual(filtered_products[0]["name"], "Product 3")
+        self.assertEqual(filtered_products[0]["category"], "Category A")
+        self.assertEqual(filtered_products[0]["price"], 20.0)
+
+    def test_list_products_with_category_and_stock(self):
+        """Test listing products with category and stock filter"""
+        # Create test products
+        product1 = ProductFactory(name="Product 1", category="Category A", stock=5)
+        response = self.client.post(BASE_URL, json=product1.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        product2 = ProductFactory(name="Product 2", category="Category B", stock=10)
+        response = self.client.post(BASE_URL, json=product2.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        product3 = ProductFactory(name="Product 3", category="Category A", stock=20)
+        response = self.client.post(BASE_URL, json=product3.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # # Send GET request with both category and price filter
+        response = self.client.get(BASE_URL + "?stock=10")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        filtered_products = response.get_json()
+        self.assertEqual(len(filtered_products), 1)  # Should return Product 2
+
+    def test_list_products_with_non_matching_filter(self):
+        """Test listing products with non-matching filter"""
+        # Create test products
+        product1 = ProductFactory(name="Product 1", category="Category A", price=0)
+        response = self.client.post(BASE_URL, json=product1.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        product2 = ProductFactory(name="Product 2", category="Category B", price=15.0)
+        response = self.client.post(BASE_URL, json=product2.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        product3 = ProductFactory(name="Product 3", category="Category A", price=20.0)
+        response = self.client.post(BASE_URL, json=product3.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Send GET request with non-matching filter
+        response = self.client.get(BASE_URL + "?category=Category%20C")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        filtered_products = response.get_json()
+        self.assertEqual(len(filtered_products), 0)  # Should return an empty list
 
     def test_create_product(self):
         """It should Create a new Product"""

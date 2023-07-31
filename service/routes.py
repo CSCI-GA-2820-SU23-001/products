@@ -7,6 +7,7 @@ Describe what your service does here
 from flask import jsonify, request, url_for, abort
 from service.common import status  # HTTP Status Codes
 from service.models import Product
+from service.common.utils import apply_filters
 
 # Import Flask application
 from . import app
@@ -117,15 +118,20 @@ def update_products(product_id):
 
 @app.route("/products", methods=["GET"])
 def list_products():
-    """ Returns all of the Products """
+    """Returns all of the Products based on filters."""
     app.logger.info("Request to list Products...")
-    products = []
-    app.logger.info('Returning unfiltered list.')
+
+    # Get the query string parameters from the request
+    filters = request.args.to_dict()
+
+    # Call a function to retrieve the list of all products
     products = Product.all()
 
-    # app.logger.info('[%s] Products returned', len(products))
-    results = [product.serialize() for product in products]
-    return results, status.HTTP_200_OK
+    # Apply filters and get the filtered results
+    filtered_products = apply_filters(products, filters)
+
+    results = [product.serialize() for product in filtered_products]
+    return jsonify(results), status.HTTP_200_OK
 
 
 ######################################################################
