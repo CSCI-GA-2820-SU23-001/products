@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: products
+  labels:
+    app: products
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0%
+      maxUnavailable: 50%
+  selector:
+    matchLabels:
+      app: products
+  template:
+    metadata:
+      labels:
+        app: products
+    spec:
+      imagePullSecrets:
+      - name: all-icr-io
+      restartPolicy: Always
+      containers:
+      - name: products
+        image: us.icr.io/leslielu7/products-su23:1.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        env:
+          - name: DATABASE_URI
+            valueFrom:
+              secretKeyRef:
+                name: postgres-creds
+                key: database_uri
+        readinessProbe:
+          initialDelaySeconds: 5
+          periodSeconds: 30
+          httpGet:
+            path: /health
+            port: 8080
+        resources:
+          limits:
+            cpu: "0.20"
+            memory: "64Mi"
+          requests:
+            cpu: "0.10"        
+            memory: "32Mi"
