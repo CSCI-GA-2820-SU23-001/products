@@ -17,11 +17,18 @@ from . import app
 ######################################################################
 
 
-@app.route("/healthcheck")
-def healthcheck():
-    """Let them know our heart is still beating"""
-    return jsonify(status=200, message="Healthy"), status.HTTP_200_OK
+# @app.route("/healthcheck")
+# def healthcheck():
+#     """Let them know our heart is still beating"""
+#     return jsonify(status=200, message="Healthy"), status.HTTP_200_OK
 
+############################################################
+# Health Endpoint
+############################################################
+@app.route("/health")
+def health():
+    """Health Status"""
+    return {"status": 'OK'}, status.HTTP_200_OK
 
 ######################################################################
 # GET INDEX
