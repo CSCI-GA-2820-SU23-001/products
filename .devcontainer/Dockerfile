@@ -14,7 +14,8 @@ USER $USERNAME
 # Set up the Python development environment
 WORKDIR /app
 COPY requirements.txt .
-RUN sudo pip install -r requirements.txt
+RUN sudo pip install -U pip wheel && \
+    sudo pip install -r requirements.txt
 
 # Install user mode tools
 COPY .devcontainer/scripts/install-tools.sh /tmp/
