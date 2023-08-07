@@ -12,20 +12,21 @@ from service.common.utils import apply_filters
 # Import Flask application
 from . import app
 
-######################################################################
-# GET HEALTH CHECK
-######################################################################
+############################################################
+# Health Endpoint
+############################################################
 
 
-@app.route("/healthcheck")
-def healthcheck():
-    """Let them know our heart is still beating"""
-    return jsonify(status=200, message="Healthy"), status.HTTP_200_OK
-
+@app.route("/health")
+def health():
+    """Health Status"""
+    return {"status": 'OK'}, status.HTTP_200_OK
 
 ######################################################################
 # GET INDEX
 ######################################################################
+
+
 @app.route("/")
 def index():
     """ Root URL response """
