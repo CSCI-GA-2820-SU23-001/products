@@ -30,13 +30,7 @@ def health():
 @app.route("/")
 def index():
     """ Root URL response """
-    return (
-        jsonify(
-            name="REST APIs for the Products service",
-            paths=url_for("create_products", _external=True),
-        ),
-        status.HTTP_200_OK,
-    )
+    return app.send_static_file("index.html")
 
 
 ######################################################################
