@@ -99,6 +99,7 @@ $(function () {
         let stock = $("#product_stock").val();
         let create_date = $("#product_create_date").val();
         let likes = $("#product_likes").val();
+        let product_id = $("#product_id").val();
 
         let data = {
             "name": name,
