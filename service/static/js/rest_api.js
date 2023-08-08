@@ -256,7 +256,10 @@ $(function () {
             let firstProduct = "";
             for(let i = 0; i < res.length; i++) {
                 let product = res[i];
-                table +=  `<tr id="row_${i}"><td>${product.id}</td><td>${product.name}</td><td>${product.price}</td><td>${product.desc}</td><td>${product.category}</td><td>${product.stock}</td><td>${product.create_date}</td><td>${product.available}</td><td>${product.likes}</td></tr>`;
+                table +=  `<tr id="row_${i}"><td>${product.id}</td><td>${product.name}</td>
+                <td>${product.price}</td><td>${product.desc}</td><td>${product.category}</td>
+                <td>${product.stock}</td><td>${product.create_date}</td>
+                <td>${product.available}</td><td>${product.likes}</td></tr>`;
                 if (i == 0) {
                     firstProduct = product;
                 }
