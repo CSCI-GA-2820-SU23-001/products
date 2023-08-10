@@ -152,3 +152,16 @@ Feature: The products service back-end
         Then I should see the message "The product has been liked!" 
         And I should see "5" in the "Likes" field
 
+    Scenario: Query by Category
+        When I visit the "home page"
+        And I set the "Category" to "Food"
+        And I press the "Search" button
+        Then I should see the message "Success"
+        And I should see "Snickers" in the results
+        And I should see "A2 Milk" in the results
+        And I should see "Normal Rice" in the results
+        And I should see "Whole Milk" in the results
+        And I should see "Basmati Rice" in the results
+        And I should not see "IKEA Floor Lamp" in the results
+        And I should not see "Axe Body Spray" in the results
+        And I should not see "PS5" in the results
