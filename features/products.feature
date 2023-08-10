@@ -130,3 +130,25 @@ Feature: The products service back-end
         And I press the "Delete" button
         Then I should see the message "Product has been Deleted!"
 
+    Scenario: Like a Product
+        When I visit the "home page"
+        And I set the "Name" to "Watermelon"
+        And I set the "Price" to "10"
+        And I set the "Category" to "Fruit"
+        And I set the "Desc" to "Juicy Fruit"
+        And I select "True" in the "Available" dropdown
+        And I set the "Likes" to "4"
+        And I set the "Stock" to "100"
+        And I set the "Create Date" to "06-08-2023"
+        And I press the "Create" button
+        Then I should see the message "Success"
+        When I copy the "Id" field
+        And I press the "Clear" button
+        Then the "Id" field should be empty
+        And the "Name" field should be empty
+        And the "Category" field should be empty
+        When I paste the "Id" field
+        And I press the "Like" button
+        Then I should see the message "The product has been liked!" 
+        And I should see "5" in the "Likes" field
+
