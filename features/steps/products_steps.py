@@ -24,27 +24,36 @@ For information on Waiting until elements are present in the HTML see:
 """
 import requests
 from behave import given
+from compare import expect
 
 # HTTP Return Codes
 HTTP_200_OK = 200
 HTTP_201_CREATED = 201
 HTTP_204_NO_CONTENT = 204
 
-@given('the server is started')
-# Uncomment below after adding products to database
-# @given('the following products') 
-
+@given('the following products')
 def step_impl(context):
-    
-    # List the return content of GET INDEX from routes.py
-    rest_endpoint = f"{context.base_url}"
+    """ Delete all Products and load new ones """
+
+    # List all of the products and delete them one by one
+    rest_endpoint = f"{context.base_url}/products"
     context.resp = requests.get(rest_endpoint)
     assert(context.resp.status_code == HTTP_200_OK)
+    for product in context.resp.json():
+        context.resp = requests.delete(f"{rest_endpoint}/{product['id']}")
+        assert(context.resp.status_code == HTTP_204_NO_CONTENT)
 
-    # Change below after implementing UI
-    context.resp = context.resp.json()
-    assert(context.resp['name'] == "REST APIs for the Products service")
-    assert(context.resp['paths'] == f"{context.base_url}/products")
-  
-
-    
+    # load the database with new pets
+    for row in context.table:
+        payload = {
+            "name": row['name'],
+            "price": row['price'],
+            "description": row['description'],
+            "category": row['category'],
+            "stock": row['stock'],
+            "create_date": row['create_date'],
+            "available": row['available'] in ['True', 'true', '1'],
+            "likes": row['likes']
+        }
+        context.resp = requests.post(rest_endpoint, json=payload)
+        assert(context.resp.status_code == HTTP_201_CREATED)
