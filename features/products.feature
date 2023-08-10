@@ -86,3 +86,25 @@ Feature: The products service back-end
         And I should see "Fruit" in the "Category" field
         And I should see "True" in the "Available" dropdown
         And I should see "2023-06-08" in the "Create_date" field
+
+    Scenario: Update a Product
+        When I visit the "home page"
+        And I set the "Name" to "Snickers"
+        And I press the "Search" button
+        Then I should see the message "Success"
+        And I should see "Snickers" in the "Name" field
+        And I should see "Food" in the "Category" field
+        When I change "Name" to "Ferrero"
+        And I press the "Update" button
+        Then I should see the message "Success"
+        When I copy the "Id" field
+        And I press the "Clear" button
+        And I paste the "Id" field
+        And I press the "Retrieve" button
+        Then I should see the message "Success"
+        And I should see "Ferrero" in the "Name" field
+        When I press the "Clear" button
+        And I press the "Search" button
+        Then I should see the message "Success"
+        And I should see "Ferrero" in the results
+        And I should not see "Snickers" in the results
