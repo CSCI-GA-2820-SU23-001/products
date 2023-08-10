@@ -86,3 +86,37 @@ Feature: The products service back-end
         And I should see "Fruit" in the "Category" field
         And I should see "True" in the "Available" dropdown
         And I should see "2023-06-08" in the "Create_date" field
+
+    Scenario: Delete a Product
+        # When I visit the "home page"
+        # And I press the "Search" button
+        # Then I should see the message "Success"
+        # And I should see "Snickers" in the results
+        # When I set the "ID" to "26"
+        # And I press the "Delete" button
+        # Then I should see the message "Product has been Deleted!"
+        # When I press the "Clear" button
+        # And I press the "Search" button
+        # Then I should see the message "Success"
+        # # And I should not see "Snickers" in the results
+        # Then I should not see "26" in the "ID" field
+        When I visit the "home page"
+        And I set the "Name" to "Watermelon"
+        And I set the "Price" to "10"
+        And I set the "Category" to "Fruit"
+        And I set the "Desc" to "Juicy Fruit"
+        And I select "True" in the "Available" dropdown
+        And I set the "Likes" to "4"
+        And I set the "Stock" to "100"
+        And I set the "Create Date" to "06-08-2023"
+        And I press the "Create" button
+        Then I should see the message "Success"
+        When I copy the "Id" field
+        And I press the "Clear" button
+        Then the "Id" field should be empty
+        And the "Name" field should be empty
+        And the "Category" field should be empty
+        When I paste the "Id" field
+        And I press the "Delete" button
+        Then I should see the message "Product has been Deleted!"
+
