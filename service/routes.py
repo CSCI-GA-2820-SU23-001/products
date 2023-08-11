@@ -4,11 +4,12 @@ My Service
 Describe what your service does here
 """
 
-from flask import jsonify, request, url_for, abort
+
+from flask import abort
 from flask_restx import Resource, fields, reqparse, inputs
 from service.common import status  # HTTP Status Codes
 from service.models import Product
-from service.common.utils import apply_filters
+# from service.common.utils import apply_filters
 
 # Import Flask application
 from . import app, api
@@ -126,18 +127,15 @@ class productResource(Resource):
         if not product:
             abort(status.HTTP_404_NOT_FOUND, f"product with id '{product_id}' was not found.")
         return product.serialize(), status.HTTP_200_OK
-    
 
     # ------------------------------------------------------------------
     # UPDATE AN EXISTING product
     # ------------------------------------------------------------------
     @api.doc("update_products")
-    # , security="apikey")
     @api.response(404, "product not found")
     @api.response(400, "The posted product data was not valid")
     @api.expect(product_model)
     @api.marshal_with(product_model)
-    # @token_required
     def put(self, product_id):
         """
         Update a product
@@ -159,9 +157,7 @@ class productResource(Resource):
     # DELETE A product
     # ------------------------------------------------------------------
     @api.doc("delete_products")
-    # , security="apikey")
     @api.response(204, "product deleted")
-    # @token_required
     def delete(self, product_id):
         """
         Delete a product
@@ -195,16 +191,10 @@ class productCollection(Resource):
         app.logger.info("Request to list products...")
         products = []
         args = product_args.parse_args()
-        
-        if args["category"]:
-            app.logger.info("Filtering by category: %s", args["category"])
-            products = Product.find_by_category(args["category"])
-        elif args["name"]:
-            app.logger.info("Filtering by name: %s", args["name"])
-            products = Product.find_by_name(args["name"])
-        elif args["available"] is not None:
-            app.logger.info("Filtering by availability: %s", args["available"])
-            products = Product.find_by_availability(args["available"])
+
+        if args["id"]:
+            app.logger.info("Filtering by id: %s", args["id"])
+            products = Product.find_by_user_id(args["id"])
         else:
             app.logger.info("Returning unfiltered list.")
             products = Product.all()
@@ -212,33 +202,14 @@ class productCollection(Resource):
         app.logger.info("[%s] products returned", len(products))
         results = [product.serialize() for product in products]
         return results, status.HTTP_200_OK
-       
-        # @app.route("/products", methods=["GET"])
-# def list_products():
-#     """Returns all of the Products based on filters."""
-#     app.logger.info("Request to list Products...")
-
-#     # Get the query string parameters from the request
-#     filters = request.args.to_dict()
-
-#     # Call a function to retrieve the list of all products
-#     products = Product.all()
-
-#     # Apply filters and get the filtered results
-#     filtered_products = apply_filters(products, filters)
-
-#     results = [product.serialize() for product in filtered_products]
-#     return jsonify(results), status.HTTP_200_OK
 
     # ------------------------------------------------------------------
     # ADD A NEW product
     # ------------------------------------------------------------------
     @api.doc("create_products")
-    # , security="apikey")
     @api.response(400, "The posted data was not valid")
     @api.expect(create_model)
     @api.marshal_with(product_model, code=201)
-    # @token_required
     def post(self):
         """
         Creates a product
@@ -304,9 +275,6 @@ class LikeResource(Resource):
         product = Product.find(product_id)
         if not product:
             abort(status.HTTP_404_NOT_FOUND, f"product with id [{product_id}] was not found.")
-        # if not product.available:
-        #     abort(status.HTTP_409_CONFLICT, f"product with id [{product_id}] is not available.")
-        # product.available = False
         product.likes += 1
         # product.id = product_id
 

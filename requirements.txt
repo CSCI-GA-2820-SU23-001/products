@@ -1,13 +1,13 @@
 # Pinned dependencies that cause breakage
 Werkzeug==2.3.3
 SQLAlchemy==2.0.0
-urllib3
 
 # Runtime dependencies
 Flask==2.3.2
 Flask-SQLAlchemy==3.0.2
 flask-restx==1.1.0
 psycopg2==2.9.5
+retry2==0.9.5
 python-dotenv==0.21.1
 
 # Runtime tools
