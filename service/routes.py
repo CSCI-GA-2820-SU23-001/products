@@ -5,7 +5,7 @@ Describe what your service does here
 """
 
 
-from flask import abort
+# from flask import abort
 from flask_restx import Resource, fields, reqparse, inputs
 from service.common import status  # HTTP Status Codes
 from service.models import Product
@@ -63,7 +63,7 @@ product_model = api.inherit(
     "ProductModel",
     create_model,
     {
-        "id": fields.String(
+        "id": fields.Integer(
             readOnly=True, description="The unique id assigned internally by service"
         ),
     },
@@ -281,3 +281,21 @@ class LikeResource(Resource):
         product.update()
         app.logger.info("product with id [%s] has been liked!", product.id)
         return product.serialize(), status.HTTP_200_OK
+    
+
+######################################################################
+#  U T I L I T Y   F U N C T I O N S
+######################################################################
+def abort(error_code: int, message: str):
+    """Logs errors before aborting"""
+    app.logger.error(message)
+    api.abort(error_code, message)
+
+
+def init_db(dbname="products"):
+    """Initialize the model"""
+    Product.init_db(dbname)
+
+def data_reset():
+    """Removes all Products from the database"""
+    Product.remove_all()

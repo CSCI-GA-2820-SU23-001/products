@@ -3,16 +3,23 @@ Models for Product
 
 All of the models are stored in this module
 """
+import os
 import logging
 from datetime import date
+from retry import retry
 # from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from requests import HTTPError, ConnectionError 
 
 logger = logging.getLogger("flask.app")
 
 # Create the SQLAlchemy object to be initialized later in init_db()
 db = SQLAlchemy()
 
+# global variables for retry (must be int)
+RETRY_COUNT = int(os.environ.get("RETRY_COUNT", 10))
+RETRY_DELAY = int(os.environ.get("RETRY_DELAY", 1))
+RETRY_BACKOFF = int(os.environ.get("RETRY_BACKOFF", 2))
 
 # Function to initialize the database
 def init_db(app):
@@ -46,7 +53,14 @@ class Product(db.Model):
 
     def __repr__(self):
         return f"<Product {self.name} id=[{self.id}]>"
-
+    
+    @retry(
+        HTTPError,
+        delay=RETRY_DELAY,
+        backoff=RETRY_BACKOFF,
+        tries=RETRY_COUNT,
+        logger=logger,
+    )
     def create(self):
         """
         Creates a Product to the database
@@ -56,6 +70,13 @@ class Product(db.Model):
         db.session.add(self)
         db.session.commit()
 
+    @retry(
+        HTTPError,
+        delay=RETRY_DELAY,
+        backoff=RETRY_BACKOFF,
+        tries=RETRY_COUNT,
+        logger=logger,
+    )
     def update(self):
         """
         Updates a Product to the database
@@ -65,6 +86,13 @@ class Product(db.Model):
             raise DataValidationError("Update called with empty ID field")
         db.session.commit()
 
+    @retry(
+        HTTPError,
+        delay=RETRY_DELAY,
+        backoff=RETRY_BACKOFF,
+        tries=RETRY_COUNT,
+        logger=logger,
+    )
     def delete(self):
         """ Removes a Product from the data store """
         logger.info("Deleting product %s", self.name)
@@ -122,19 +150,41 @@ class Product(db.Model):
         app.app_context().push()
         db.create_all()  # make our sqlalchemy tables
 
+
     @classmethod
+    @retry(
+        HTTPError,
+        delay=RETRY_DELAY,
+        backoff=RETRY_BACKOFF,
+        tries=RETRY_COUNT,
+        logger=logger,
+    )
     def all(cls) -> list:
         """ Returns all of the Products in the database """
         logger.info("Processing all Products")
         return cls.query.all()
 
     @classmethod
+    @retry(
+        HTTPError,
+        delay=RETRY_DELAY,
+        backoff=RETRY_BACKOFF,
+        tries=RETRY_COUNT,
+        logger=logger,
+    )
     def find(cls, product_id: int):
         """ Finds a Product by it's ID """
         logger.info("Processing lookup for id %s ...", product_id)
         return cls.query.get(product_id)
 
     @classmethod
+    @retry(
+        HTTPError,
+        delay=RETRY_DELAY,
+        backoff=RETRY_BACKOFF,
+        tries=RETRY_COUNT,
+        logger=logger,
+    )
     def find_or_404(cls, product_id: int):
         """Find a Product by it's id
 
@@ -149,6 +199,13 @@ class Product(db.Model):
         return cls.query.get_or_404(product_id)
 
     @classmethod
+    @retry(
+        HTTPError,
+        delay=RETRY_DELAY,
+        backoff=RETRY_BACKOFF,
+        tries=RETRY_COUNT,
+        logger=logger,
+    )
     def find_by_name(cls, name: str) -> list:
         """Returns all Products with the given name
 
@@ -163,6 +220,13 @@ class Product(db.Model):
         return cls.query.filter(cls.name == name)
 
     @classmethod
+    @retry(
+        HTTPError,
+        delay=RETRY_DELAY,
+        backoff=RETRY_BACKOFF,
+        tries=RETRY_COUNT,
+        logger=logger,
+    )
     def find_by_category(cls, category: str) -> list:
         """Returns all of the Products in a category
 
@@ -177,6 +241,13 @@ class Product(db.Model):
         return cls.query.filter(cls.category == category)
 
     @classmethod
+    @retry(
+        HTTPError,
+        delay=RETRY_DELAY,
+        backoff=RETRY_BACKOFF,
+        tries=RETRY_COUNT,
+        logger=logger,
+    )
     def find_by_price(cls, price: float) -> list:
         """Returns all of the Products of a given price
 
@@ -191,6 +262,13 @@ class Product(db.Model):
         return cls.query.filter(cls.price == price)
 
     @classmethod
+    @retry(
+        HTTPError,
+        delay=RETRY_DELAY,
+        backoff=RETRY_BACKOFF,
+        tries=RETRY_COUNT,
+        logger=logger,
+    )
     def find_by_stock(cls, stock: int) -> list:
         """Returns all of the Products of a given stock
 
@@ -205,6 +283,13 @@ class Product(db.Model):
         return cls.query.filter(cls.stock == stock)
 
     @classmethod
+    @retry(
+        HTTPError,
+        delay=RETRY_DELAY,
+        backoff=RETRY_BACKOFF,
+        tries=RETRY_COUNT,
+        logger=logger,
+    )
     def find_by_create_date(cls, create_date: date) -> list:
         """Returns all of the Products of a given date
 
@@ -219,6 +304,13 @@ class Product(db.Model):
         return cls.query.filter(cls.create_date == create_date)
 
     @classmethod
+    @retry(
+        HTTPError,
+        delay=RETRY_DELAY,
+        backoff=RETRY_BACKOFF,
+        tries=RETRY_COUNT,
+        logger=logger,
+    )
     def find_by_available(cls, available: bool = True) -> list:
         """Returns all of the Products that are available
 
