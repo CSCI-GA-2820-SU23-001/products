@@ -72,6 +72,9 @@ product_model = api.inherit(
 # query string arguments
 product_args = reqparse.RequestParser()
 product_args.add_argument(
+    "id", type=int, location="args", required=False, help="List Products by id"
+)
+product_args.add_argument(
     "name", type=str, location="args", required=False, help="List Products by name"
 )
 product_args.add_argument(
@@ -100,7 +103,7 @@ product_args.add_argument(
 ######################################################################
 @api.route("/products/<product_id>")
 @api.param("product_id", "The product identifier")
-class productResource(Resource):
+class ProductResource(Resource):
     """
     productResource class
 
@@ -177,7 +180,7 @@ class productResource(Resource):
 #  PATH: /products
 ######################################################################
 @api.route("/products", strict_slashes=False)
-class productCollection(Resource):
+class ProductCollection(Resource):
     """Handles all interactions with collections of products"""
 
     # ------------------------------------------------------------------
@@ -189,16 +192,37 @@ class productCollection(Resource):
     def get(self):
         """Returns all of the products"""
         app.logger.info("Request to list products...")
-        # products = []
-        # args = product_args.parse_args()
-        # print(args)
-        # if args["id"]:
-        #     app.logger.info("Filtering by id: %s", args["id"])
-        #     products = Product.find_by_user_id(args["id"])
-        # else:
-        # app.logger.info("Returning unfiltered list.")
-        products = Product.all()
-
+        args = product_args.parse_args()
+        filtered = False
+        if args['name']:
+            app.logger.info("Filtering by name: %s", args['name'])
+            products = Product.find_by_name(args['name'])
+            filtered = True
+        elif args['price']:
+            app.logger.info("Filtering by price: %s", args['price'])
+            products = Product.find_by_price(args['price'])
+            filtered = True
+        elif args['category']:
+            app.logger.info("Filtering by category: %s", args['category'])
+            products = Product.find_by_category(args['category'])
+            filtered = True
+        elif args['stock']:
+            app.logger.info("Filtering by stock: %s", args['stock'])
+            products = Product.find_by_stock(args['stock'])
+            filtered = True
+        elif args['create_date']:
+            app.logger.info("Filtering by create_date: %s", args['create_date'])
+            products = Product.find_by_create_date(args['create_date'])
+            filtered = True
+        elif args['available']:
+            app.logger.info("Filtering by available: %s", args['available'])
+            products = Product.find_by_available(args['available'])
+            filtered = True
+        else:
+            app.logger.info("Returning unfiltered list.")
+            products = Product.all()
+        if filtered:
+            products = products.all()
         app.logger.info("[%s] products returned", len(products))
         results = [product.serialize() for product in products]
         return results, status.HTTP_200_OK
@@ -221,7 +245,7 @@ class productCollection(Resource):
         product.deserialize(api.payload)
         product.create()
         app.logger.info("product with new id [%s] created!", product.id)
-        location_url = api.url_for(productResource, product_id=product.id, _external=True)
+        location_url = api.url_for(ProductResource, product_id=product.id, _external=True)
         return product.serialize(), status.HTTP_201_CREATED, {"Location": location_url}
 
 
@@ -287,7 +311,7 @@ class LikeResource(Resource):
         product.update()
         app.logger.info("product with id [%s] has been liked!", product.id)
         return product.serialize(), status.HTTP_200_OK
-    
+
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
@@ -301,6 +325,7 @@ def abort(error_code: int, message: str):
 def init_db(dbname="products"):
     """Initialize the model"""
     Product.init_db(dbname)
+
 
 def data_reset():
     """Removes all Products from the database"""

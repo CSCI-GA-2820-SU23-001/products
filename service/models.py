@@ -9,8 +9,8 @@ from datetime import date
 from retry import retry
 # from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from requests import HTTPError, ConnectionError 
-
+from requests import HTTPError
+# from requests import ConnectionError
 logger = logging.getLogger("flask.app")
 
 # Create the SQLAlchemy object to be initialized later in init_db()
@@ -20,6 +20,7 @@ db = SQLAlchemy()
 RETRY_COUNT = int(os.environ.get("RETRY_COUNT", 10))
 RETRY_DELAY = int(os.environ.get("RETRY_DELAY", 1))
 RETRY_BACKOFF = int(os.environ.get("RETRY_BACKOFF", 2))
+
 
 # Function to initialize the database
 def init_db(app):
@@ -53,7 +54,7 @@ class Product(db.Model):
 
     def __repr__(self):
         return f"<Product {self.name} id=[{self.id}]>"
-    
+
     @retry(
         HTTPError,
         delay=RETRY_DELAY,
@@ -149,7 +150,6 @@ class Product(db.Model):
         db.init_app(app)
         app.app_context().push()
         db.create_all()  # make our sqlalchemy tables
-
 
     @classmethod
     @retry(
