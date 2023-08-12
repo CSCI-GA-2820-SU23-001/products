@@ -320,13 +320,3 @@ def abort(error_code: int, message: str):
     """Logs errors before aborting"""
     app.logger.error(message)
     api.abort(error_code, message)
-
-
-def init_db(dbname="products"):
-    """Initialize the model"""
-    Product.init_db(dbname)
-
-
-def data_reset():
-    """Removes all Products from the database"""
-    Product.remove_all()
