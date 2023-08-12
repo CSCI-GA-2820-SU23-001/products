@@ -189,15 +189,15 @@ class productCollection(Resource):
     def get(self):
         """Returns all of the products"""
         app.logger.info("Request to list products...")
-        products = []
-        args = product_args.parse_args()
-
-        if args["id"]:
-            app.logger.info("Filtering by id: %s", args["id"])
-            products = Product.find_by_user_id(args["id"])
-        else:
-            app.logger.info("Returning unfiltered list.")
-            products = Product.all()
+        # products = []
+        # args = product_args.parse_args()
+        # print(args)
+        # if args["id"]:
+        #     app.logger.info("Filtering by id: %s", args["id"])
+        #     products = Product.find_by_user_id(args["id"])
+        # else:
+        # app.logger.info("Returning unfiltered list.")
+        products = Product.all()
 
         app.logger.info("[%s] products returned", len(products))
         results = [product.serialize() for product in products]
@@ -248,7 +248,13 @@ class PurchaseResource(Resource):
             abort(status.HTTP_404_NOT_FOUND, f"product with id [{product_id}] was not found.")
         if not product.available:
             abort(status.HTTP_409_CONFLICT, f"product with id [{product_id}] is not available.")
-        product.available = False
+        if product.stock > 0:
+            product.stock -= 1
+            if product.stock == 0:
+                product.available = False
+            # db.session.commit()
+            # return True
+        # product.available = False
         product.update()
         app.logger.info("product with id [%s] has been purchased!", product.id)
         return product.serialize(), status.HTTP_200_OK
