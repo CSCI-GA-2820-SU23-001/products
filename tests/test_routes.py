@@ -19,7 +19,8 @@ from tests.factories import ProductFactory
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb"
 )
-BASE_URL = "/products"
+BASE_URL = "/api/products"
+CONTENT_TYPE_JSON = "application/json"
 
 ######################################################################
 #  T E S T   C A S E S
@@ -140,6 +141,23 @@ class TestProductService(TestCase):
         products = response.get_json()
         self.assertEqual(len(products), 3)  # Should return all products
 
+    def test_list_products_with_name(self):
+        """Test listing products with name filter"""
+        # Create test products
+        product1 = ProductFactory(name="Product 1", category="Category A", price=10.0)
+        response = self.client.post(BASE_URL, json=product1.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        product2 = ProductFactory(name="Product 2", category="Category B", price=15.0)
+        response = self.client.post(BASE_URL, json=product2.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Send GET request with name filter
+        response = self.client.get(BASE_URL + "?name=Product%201")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        filtered_products = response.get_json()
+        self.assertEqual(len(filtered_products), 1)  # Should return products with Product 1
+
     def test_list_products_with_category(self):
         """Test listing products with category filter"""
         # Create test products
@@ -226,6 +244,40 @@ class TestProductService(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         filtered_products = response.get_json()
         self.assertEqual(len(filtered_products), 1)  # Should return Product 2
+
+    def test_list_products_with_create_date(self):
+        """Test listing products with create_date filter"""
+        # Create test products
+        product1 = ProductFactory(create_date=date.fromisoformat('20090212'))
+        response = self.client.post(BASE_URL, json=product1.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        product2 = ProductFactory(create_date=date.fromisoformat('20230812'))
+        response = self.client.post(BASE_URL, json=product2.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Send GET request with create_date filter
+        response = self.client.get(BASE_URL + "?create_date=2009-02-12")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        filtered_products = response.get_json()
+        self.assertEqual(len(filtered_products), 1)  # Should return products with create_date=2009-02-12
+
+    def test_list_products_with_available(self):
+        """Test listing products with available filter"""
+        # Create test products
+        product1 = ProductFactory(stock=5, available=True)
+        response = self.client.post(BASE_URL, json=product1.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        product2 = ProductFactory(stock=0, available=False)
+        response = self.client.post(BASE_URL, json=product2.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Send GET request with create_date filter
+        response = self.client.get(BASE_URL + "?available=true")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        filtered_products = response.get_json()
+        self.assertEqual(len(filtered_products), 1)  # Should return products with available is True
 
     def test_list_products_with_non_matching_filter(self):
         """Test listing products with non-matching filter"""
@@ -320,7 +372,7 @@ class TestProductService(TestCase):
         new_product = response.get_json()
         logging.debug(new_product)
         old_stock = new_product["stock"]
-        response = self.client.post(f"{BASE_URL}/{new_product['id']}/purchase", json=new_product)
+        response = self.client.put(f"{BASE_URL}/{new_product['id']}/purchase", json=new_product)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         updated_product = response.get_json()
         self.assertEqual(updated_product["stock"], old_stock - 1)
@@ -335,14 +387,14 @@ class TestProductService(TestCase):
 
         new_product = response.get_json()
         logging.debug(new_product)
-        response = self.client.post(f"{BASE_URL}/{new_product['id']}/purchase")
+        response = self.client.put(f"{BASE_URL}/{new_product['id']}/purchase")
         self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
         data = response.get_json()
-        self.assertEqual(data["error"], "Product out of stock")
+        self.assertEqual(data["message"], f"product with id [{new_product['id']}] is not available.")
 
     def test_purchase_product_not_found(self):
         """It should not Purchase a Product that is not found"""
-        response = self.client.post(f"{BASE_URL}/0/purchase")
+        response = self.client.put(f"{BASE_URL}/0/purchase")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         data = response.get_json()
         self.assertIn("was not found", data["message"])
@@ -357,7 +409,7 @@ class TestProductService(TestCase):
 
         new_product = response.get_json()
         logging.debug(new_product)
-        response = self.client.post(f"{BASE_URL}/{new_product['id']}/purchase")
+        response = self.client.put(f"{BASE_URL}/{new_product['id']}/purchase")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # Check if the stock is updated to 0 and availability is set to False

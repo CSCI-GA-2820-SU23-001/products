@@ -69,7 +69,7 @@ $(function () {
         
         let ajax = $.ajax({
             type: "POST",
-            url: "/products",
+            url: "/api/products",
             contentType: "application/json",
             data: JSON.stringify(data),
         });
@@ -116,7 +116,7 @@ $(function () {
 
         let ajax = $.ajax({
                 type: "PUT",
-                url: `/products/${product_id}`,
+                url: `/api/products/${product_id}`,
                 contentType: "application/json",
                 data: JSON.stringify(data)
             })
@@ -144,7 +144,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "GET",
-            url: `/products/${product_id}`,
+            url: `/api/products/${product_id}`,
             contentType: "application/json",
             data: ''
         })
@@ -174,7 +174,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "DELETE",
-            url: `/products/${product_id}`,
+            url: `/api/products/${product_id}`,
             contentType: "application/json",
             data: '',
         })
@@ -233,7 +233,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "GET",
-            url: `/products?${queryString}`,
+            url: `/api/products?${queryString}`,
             contentType: "application/json",
             data: ''
         })
@@ -272,7 +272,7 @@ $(function () {
                 update_form_data(firstProduct)
             }
 
-            flash_message("Success")
+            flash_message("Success")      
         });
 
         ajax.fail(function(res){
@@ -293,7 +293,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "PUT",
-            url: `/products/${product_id}/like`,
+            url: `/api/products/${product_id}/like`,
             contentType: "application/json",
             data: ''
         })
