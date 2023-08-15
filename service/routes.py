@@ -64,6 +64,12 @@ product_args = reqparse.RequestParser()
 product_args.add_argument(
     "category", type=str, location="args", required=False, help="Query Product by Category"
 )
+product_args.add_argument(
+    "price", type=float, location="args", required=False, help="Query Product by Price"
+)
+product_args.add_argument(
+    "stock", type=int, location="args", required=False, help="Query Product by Stock"
+)
 
 
 ######################################################################
@@ -117,7 +123,7 @@ class ProductResource(Resource):
         if not product:
             abort(
                 status.HTTP_404_NOT_FOUND,
-                f"Product with id '{product_id}' could not be found.",
+                f"was not found",
             )
         app.logger.info("Returning product: %s", product.id)
         return product.serialize(), status.HTTP_200_OK
@@ -165,14 +171,19 @@ class ProductResource(Resource):
             app.logger.info("Product with id [%s] was deleted", product_id)
 
         return "", status.HTTP_204_NO_CONTENT
-    
-    # ------------------------------------------------------------------
-    # LIKE AN PRODUCT
-    # ------------------------------------------------------------------
+
+######################################################################
+#  LIKE AN PRODUCT
+######################################################################
+@api.route("/products/<int:product_id>/like")
+@api.param("product_id", "The Product identifier")
+class LikeProductResource(Resource):
+    """Like a Product"""
+
     @api.doc("like_products")
     @api.response(200, "The product has been liked!")
     @api.response(404, "Product not found")
-    def like(self, product_id):
+    def put(self, product_id):
         """
         Like a Product
         This endpoint will like a Product based on it's id
@@ -182,7 +193,7 @@ class ProductResource(Resource):
         if not product:
             abort(
                 status.HTTP_404_NOT_FOUND,
-                f"Product with id '{product_id}' was not found."
+                f"was not found"
             )
         
         product.likes += 1
@@ -193,6 +204,37 @@ class ProductResource(Resource):
 
         return product.serialize(), status.HTTP_200_OK
 
+
+######################################################################
+#  PATH: /products/{id}/purchase
+######################################################################
+@api.route("/products/<int:product_id>/purchase")
+@api.param("product_id", "The Product identifier")
+class PurchaseProductResource(Resource):
+    """Purchase a Product"""
+    @api.doc("purchase_products")
+    @api.response(404, "Product not found")
+    @api.response(409, "The Product is not available for purchase")
+    def put(self, product_id):
+        """
+        Purchase a Product
+
+        This endpoint will purchase a Product and make it unavailable
+        """
+        app.logger.info("Request to Purchase a Product")
+        product = Product.find(product_id)
+        if not product:
+            abort(status.HTTP_404_NOT_FOUND, f"Product with id [{product_id}] was not found.")
+        if not product.available:
+            abort(status.HTTP_409_CONFLICT, f"Product out of stock")
+        product.stock -= 1
+        product.available = False
+        product.update()
+
+        app.logger.info("Product with id [%s] has been purchased!", product_id)
+
+        return product.serialize(), status.HTTP_200_OK
+    
 
 ######################################################################
 #  PATH: /products
@@ -218,9 +260,15 @@ class ProductCollection(Resource):
 
         products = []
         args = product_args.parse_args()
-
+        
         if args["category"]:
             products = Product.find_by_category(args["category"])
+        elif args["category"] and args["stock"]:
+            products = Product.find_by_category_and_stock(args["category"], args["stock"])
+        elif args["price"]:
+            products = Product.find_by_price(args["price"])
+        elif args["stock"]:
+            products = Product.find_by_stock(args["stock"])
         else:
             products = Product.all()
 
