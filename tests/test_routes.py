@@ -19,7 +19,7 @@ from tests.factories import ProductFactory
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb"
 )
-BASE_URL = "/products"
+BASE_URL = "/api/products"
 
 ######################################################################
 #  T E S T   C A S E S
@@ -185,26 +185,24 @@ class TestProductService(TestCase):
     def test_list_products_with_stock(self):
         """Test listing products with stock filter"""
         # Create test products
-        product1 = ProductFactory(name="Product 1", category="Category A", price=10.0)
+        product1 = ProductFactory(name="Product 1", category="Category A", price=10.0, stock=5)
         response = self.client.post(BASE_URL, json=product1.serialize())
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        product2 = ProductFactory(name="Product 2", category="Category B", price=15.0)
+        product2 = ProductFactory(name="Product 2", category="Category B", price=15.0,stock=10)
         response = self.client.post(BASE_URL, json=product2.serialize())
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        product3 = ProductFactory(name="Product 3", category="Category A", price=20.0)
+        product3 = ProductFactory(name="Product 3", category="Category A", price=20.0,stock=20)
         response = self.client.post(BASE_URL, json=product3.serialize())
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        # Send GET request with both category and price filter
-        response = self.client.get(BASE_URL + "?category=Category%20A&price=20.0")
+        # Send GET request with stock filter
+        response = self.client.get(BASE_URL + "?stock=10")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         filtered_products = response.get_json()
-        self.assertEqual(len(filtered_products), 1)  # Should return Product 3
-        self.assertEqual(filtered_products[0]["name"], "Product 3")
-        self.assertEqual(filtered_products[0]["category"], "Category A")
-        self.assertEqual(filtered_products[0]["price"], 20.0)
+        self.assertEqual(len(filtered_products), 1)  # Should return Product 2
+
 
     def test_list_products_with_category_and_stock(self):
         """Test listing products with category and stock filter"""
@@ -221,11 +219,15 @@ class TestProductService(TestCase):
         response = self.client.post(BASE_URL, json=product3.serialize())
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        # # Send GET request with both category and price filter
-        response = self.client.get(BASE_URL + "?stock=10")
+        # # Send GET request with both category and stock filter
+        response = self.client.get(BASE_URL + "?category=Category%20B&stock=10")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         filtered_products = response.get_json()
-        self.assertEqual(len(filtered_products), 1)  # Should return Product 2
+        self.assertEqual(len(filtered_products), 1)  # Should return Product 3
+        self.assertEqual(filtered_products[0]["name"], "Product 2")
+        self.assertEqual(filtered_products[0]["category"], "Category B")
+        self.assertEqual(filtered_products[0]["stock"], 10) 
+
 
     def test_list_products_with_non_matching_filter(self):
         """Test listing products with non-matching filter"""
@@ -320,7 +322,7 @@ class TestProductService(TestCase):
         new_product = response.get_json()
         logging.debug(new_product)
         old_stock = new_product["stock"]
-        response = self.client.post(f"{BASE_URL}/{new_product['id']}/purchase", json=new_product)
+        response = self.client.put(f"{BASE_URL}/{new_product['id']}/purchase", json=new_product)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         updated_product = response.get_json()
         self.assertEqual(updated_product["stock"], old_stock - 1)
@@ -335,14 +337,14 @@ class TestProductService(TestCase):
 
         new_product = response.get_json()
         logging.debug(new_product)
-        response = self.client.post(f"{BASE_URL}/{new_product['id']}/purchase")
+        response = self.client.put(f"{BASE_URL}/{new_product['id']}/purchase")
         self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
         data = response.get_json()
-        self.assertEqual(data["error"], "Product out of stock")
+        self.assertEqual(data["message"], "Product out of stock")
 
     def test_purchase_product_not_found(self):
         """It should not Purchase a Product that is not found"""
-        response = self.client.post(f"{BASE_URL}/0/purchase")
+        response = self.client.put(f"{BASE_URL}/0/purchase")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         data = response.get_json()
         self.assertIn("was not found", data["message"])
@@ -357,7 +359,7 @@ class TestProductService(TestCase):
 
         new_product = response.get_json()
         logging.debug(new_product)
-        response = self.client.post(f"{BASE_URL}/{new_product['id']}/purchase")
+        response = self.client.put(f"{BASE_URL}/{new_product['id']}/purchase")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # Check if the stock is updated to 0 and availability is set to False
