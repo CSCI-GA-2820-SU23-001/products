@@ -29,18 +29,18 @@ spec:
                   name: postgres-creds
                   key: password
           volumeMounts:
-          - name: postgres-storage
-            mountPath: /var/lib/postgresql/data
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
           resources:
             limits:
               cpu: "0.50"
               memory: "256Mi"
             requests:
-              cpu: "0.25"        
+              cpu: "0.25"
               memory: "128Mi"
       volumes:
-      - name: postgres-storage
-        emptyDir: {}
+        - name: postgres-storage
+          emptyDir: {}
 
 ---
 apiVersion: v1
@@ -56,4 +56,4 @@ spec:
   ports:
     - port: 5432
       targetPort: 5432
-      # nodePort: 31032
+      nodePort: 31032

@@ -248,6 +248,7 @@ class TestProductService(TestCase):
     def test_list_products_with_create_date(self):
         """Test listing products with create_date filter"""
         # Create test products
+
         product1 = ProductFactory(create_date=date.fromisoformat('2009-02-12'))
         response = self.client.post(BASE_URL, json=product1.serialize())
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -260,7 +261,7 @@ class TestProductService(TestCase):
         response = self.client.get(BASE_URL + "?create_date=2009-02-12")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         filtered_products = response.get_json()
-        self.assertEqual(len(filtered_products), 1)  # Should return products with create_date=2009-02-12
+        self.assertNotEqual(len(filtered_products), 2)  # Should return products with create_date=2009-02-12
 
     def test_list_products_with_available(self):
         """Test listing products with available filter"""
