@@ -20,31 +20,31 @@ spec:
         app: products
     spec:
       imagePullSecrets:
-      - name: all-icr-io
+        - name: all-icr-io
       restartPolicy: Always
       containers:
-      - name: products
-        image: us.icr.io/leslielu7/products-su23:1.2
-        imagePullPolicy: IfNotPresent
-        ports:
-        - containerPort: 8080
-          protocol: TCP
-        env:
-          - name: DATABASE_URI
-            valueFrom:
-              secretKeyRef:
-                name: postgres-creds
-                key: database_uri
-        readinessProbe:
-          initialDelaySeconds: 5
-          periodSeconds: 30
-          httpGet:
-            path: /health
-            port: 8080
-        resources:
-          limits:
-            cpu: "0.20"
-            memory: "64Mi"
-          requests:
-            cpu: "0.10"        
-            memory: "32Mi"
+        - name: products
+          image: us.icr.io/leslielu7/products-su23:1.2
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          env:
+            - name: DATABASE_URI
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-creds
+                  key: database_uri
+          readinessProbe:
+            initialDelaySeconds: 5
+            periodSeconds: 30
+            httpGet:
+              path: /health
+              port: 8080
+          resources:
+            limits:
+              cpu: "0.20"
+              memory: "64Mi"
+            requests:
+              cpu: "0.10"
+              memory: "32Mi"
