@@ -2,7 +2,7 @@
 REGISTRY ?= us.icr.io
 NAMESPACE ?= leslielu7
 IMAGE_NAME ?= products-su23
-IMAGE_TAG ?= 1.3
+IMAGE_TAG ?= 1.4
 IMAGE ?= $(REGISTRY)/$(NAMESPACE)/$(IMAGE_NAME):$(IMAGE_TAG)
 # PLATFORM ?= "linux/amd64,linux/arm64"
 PLATFORM ?= "linux/amd64"

@@ -24,7 +24,7 @@ spec:
       restartPolicy: Always
       containers:
         - name: products
-          image: us.icr.io/leslielu7/products-su23:1.2
+          image: us.icr.io/leslielu7/products-su23:1.4
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
