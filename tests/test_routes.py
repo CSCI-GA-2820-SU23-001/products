@@ -248,11 +248,11 @@ class TestProductService(TestCase):
     def test_list_products_with_create_date(self):
         """Test listing products with create_date filter"""
         # Create test products
-        product1 = ProductFactory(create_date=date.fromisoformat('20090212'))
+        product1 = ProductFactory(create_date=date.fromisoformat('2009-02-12'))
         response = self.client.post(BASE_URL, json=product1.serialize())
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        product2 = ProductFactory(create_date=date.fromisoformat('20230812'))
+        product2 = ProductFactory(create_date=date.fromisoformat('2023-08-12'))
         response = self.client.post(BASE_URL, json=product2.serialize())
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
