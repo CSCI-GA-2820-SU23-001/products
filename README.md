@@ -41,7 +41,6 @@ These should be copied using a bash shell as follows:
 | delete_products  | DELETE  | ```/products/{int:product_id}```
 | list_products    | GET     | ```/products```
 | like_products    | PUT     | ```/products/{int:product_id}/like```
-| purchase_product | POST    | ```/products/{int:product_id}/purchase```
 
 ## Product Service APIs - Usage 
 
